@@ -14,7 +14,7 @@ class AppRouter {
   static const home = '/home';
 
   static final routes = GoRouter(
-    initialLocation: splash,
+    initialLocation: login,
     navigatorKey: navigatorKey,
     routes: [
       GoRoute(

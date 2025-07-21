@@ -32,6 +32,19 @@ dev_dependencies:
   custom_lint: ^0.7.6
   riverpod_lint: ^2.6.5
   json_serializable: ^6.9.5
+  flutter_gen: ^5.10.0
+  flutter_gen_runner: ^5.10.0
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/images/
+
+flutter_gen:
+  output: lib/gen/
+  line_length: 80
+
+  integrations:
+    image: false
+    flutter_svg: false

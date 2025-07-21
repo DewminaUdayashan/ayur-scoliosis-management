@@ -1,4 +1,4 @@
-import 'package:ayur_scoliosis_management/core/router.dart';
+import 'package:ayur_scoliosis_management/core/app_router.dart';
 import 'package:ayur_scoliosis_management/core/theme.dart';
 import 'package:flutter/material.dart';
 
