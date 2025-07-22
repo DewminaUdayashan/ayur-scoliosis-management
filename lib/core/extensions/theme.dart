@@ -23,6 +23,11 @@ extension ThemeExtension on BuildContext {
   /// This is equivalent to calling `Theme.of(context)`.
   ThemeData get theme => Theme.of(this);
 
+  /// Returns the current [ColorScheme] for this build context.
+  ///
+  /// This is equivalent to calling `Theme.of(context).colorScheme`.
+  ColorScheme get colorScheme => theme.colorScheme;
+
   /// Returns the primary color from the current theme.
   ///
   /// This is a convenience getter for accessing the theme's primary color

@@ -1,3 +1,4 @@
+import 'package:ayur_scoliosis_management/core/app_router.dart';
 import 'package:ayur_scoliosis_management/core/constants/size.dart';
 import 'package:ayur_scoliosis_management/core/extensions/size.dart';
 import 'package:ayur_scoliosis_management/core/extensions/theme.dart';
@@ -8,6 +9,7 @@ import 'package:ayur_scoliosis_management/widgets/app_text_field.dart';
 import 'package:ayur_scoliosis_management/widgets/buttons/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class LoginScreen extends HookConsumerWidget {
@@ -97,6 +99,7 @@ class LoginScreen extends HookConsumerWidget {
                 isLoading: false,
                 label: 'Login',
                 onPressed: () {
+                  context.push(AppRouter.otpVerification);
                   if (formKey.currentState?.validate() != true) {
                     return;
                   }
