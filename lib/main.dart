@@ -1,10 +1,11 @@
 import 'package:ayur_scoliosis_management/core/app_router.dart';
 import 'package:ayur_scoliosis_management/core/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
+  runApp(ProviderScope(child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
