@@ -19,4 +19,9 @@ extension SizeExtension on BuildContext {
   /// This is a convenience getter for accessing the height of the screen
   /// without having to call `MediaQuery.of(context).size.height`.
   double get height => screenSize.height;
+
+  /// Returns the bottom padding of the screen.
+  /// ///
+  /// This is equivalent to calling `MediaQuery.of(context).padding.bottom`.
+  double get bottomPadding => MediaQuery.paddingOf(this).bottom;
 }

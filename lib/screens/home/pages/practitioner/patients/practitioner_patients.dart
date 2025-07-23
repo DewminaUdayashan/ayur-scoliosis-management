@@ -1,3 +1,4 @@
+import 'package:ayur_scoliosis_management/core/app_router.dart';
 import 'package:ayur_scoliosis_management/core/constants/size.dart';
 import 'package:ayur_scoliosis_management/core/extensions/size.dart';
 import 'package:ayur_scoliosis_management/core/extensions/theme.dart';
@@ -7,6 +8,7 @@ import 'package:ayur_scoliosis_management/widgets/app_text_field.dart';
 import 'package:ayur_scoliosis_management/widgets/patient_profile_avatar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class PractitionerPatients extends HookConsumerWidget {
@@ -47,9 +49,10 @@ class PractitionerPatients extends HookConsumerWidget {
                       title: Text('Patient 1'),
                       subtitle: Text('Condition: Scoliosis'),
                       trailing: Text('Last Visit: 2023-10-01'),
-                      onTap: () {
-                        // Navigate to patient details
-                      },
+                      onTap: () => context.push(
+                        AppRouter.patientDetails,
+                        extra: {'id': index + 1},
+                      ),
                     );
                   },
                 ),

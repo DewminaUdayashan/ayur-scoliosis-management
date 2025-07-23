@@ -1,5 +1,3 @@
-// dart format width=80
-
 /// GENERATED CODE - DO NOT MODIFY BY HAND
 /// *****************************************************
 ///  FlutterGen
@@ -7,7 +5,7 @@
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
-// ignore_for_file: deprecated_member_use,directives_ordering,implicit_dynamic_list_literal,unnecessary_import
+// ignore_for_file: directives_ordering,unnecessary_import,implicit_dynamic_list_literal,deprecated_member_use
 
 class $AssetsImagesGen {
   const $AssetsImagesGen();
@@ -15,8 +13,11 @@ class $AssetsImagesGen {
   /// File path: assets/images/logo.png
   String get logo => 'assets/images/logo.png';
 
+  /// File path: assets/images/x-ray.jpg
+  String get xRay => 'assets/images/x-ray.jpg';
+
   /// List of all assets
-  List<String> get values => [logo];
+  List<String> get values => [logo, xRay];
 }
 
 class Assets {
