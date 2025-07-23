@@ -1,4 +1,5 @@
 import 'package:ayur_scoliosis_management/screens/auth/login_screen.dart';
+import 'package:ayur_scoliosis_management/screens/auth/otp_verification_screen.dart';
 import 'package:ayur_scoliosis_management/screens/home/home_screen.dart';
 import 'package:ayur_scoliosis_management/screens/splash/splash_screen.dart';
 import 'package:flutter/material.dart' show NavigatorState, GlobalKey;
@@ -10,11 +11,12 @@ class AppRouter {
   static const splash = '/';
 
   static const login = '/login';
+  static const otpVerification = '/otp-verification';
 
   static const home = '/home';
 
   static final routes = GoRouter(
-    initialLocation: splash,
+    initialLocation: home,
     navigatorKey: navigatorKey,
     routes: [
       GoRoute(
@@ -27,6 +29,12 @@ class AppRouter {
         path: login,
         builder: (context, state) {
           return const LoginScreen();
+        },
+      ),
+      GoRoute(
+        path: otpVerification,
+        builder: (context, state) {
+          return const OtpVerificationScreen();
         },
       ),
       GoRoute(

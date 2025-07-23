@@ -16,7 +16,7 @@ class AppTheme {
     primaryColor: Color.fromRGBO(25, 147, 229, 1),
     colorScheme: ColorScheme.fromSeed(
       seedColor: primary,
-    ).copyWith(primary: primary, surface: background),
+    ).copyWith(primary: textPrimary, surface: background),
     textTheme: GoogleFonts.lexendTextTheme(textTheme),
     scaffoldBackgroundColor: background,
   );

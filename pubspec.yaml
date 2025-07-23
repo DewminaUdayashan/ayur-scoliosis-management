@@ -21,6 +21,7 @@ dependencies:
   dio: ^5.8.0+1
   intl: ^0.20.2
   google_fonts: ^6.2.1
+  pinput: ^5.0.1
 
 dev_dependencies:
   flutter_test:
@@ -32,6 +33,19 @@ dev_dependencies:
   custom_lint: ^0.7.6
   riverpod_lint: ^2.6.5
   json_serializable: ^6.9.5
+  flutter_gen: ^5.10.0
+  flutter_gen_runner: ^5.10.0
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/images/
+
+flutter_gen:
+  output: lib/gen/
+  line_length: 80
+
+  integrations:
+    image: false
+    flutter_svg: false
