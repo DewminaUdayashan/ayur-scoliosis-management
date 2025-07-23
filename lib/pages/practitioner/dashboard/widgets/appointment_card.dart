@@ -2,6 +2,7 @@ import 'package:ayur_scoliosis_management/core/constants/size.dart'
     show radius8;
 import 'package:ayur_scoliosis_management/core/extensions/theme.dart';
 import 'package:ayur_scoliosis_management/core/theme.dart';
+import 'package:ayur_scoliosis_management/widgets/patient_profile_avatar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -17,7 +18,7 @@ class AppointmentCard extends StatelessWidget {
       child: ListTile(
         tileColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: radius8),
-        leading: CircleAvatar(),
+        leading: PatientProfileAvatar(),
         title: Text('Patient Name'),
         subtitle: Row(
           spacing: 4,

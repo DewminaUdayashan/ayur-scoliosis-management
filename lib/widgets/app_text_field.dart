@@ -7,7 +7,7 @@ class AppTextField extends StatelessWidget {
     super.key,
     this.controller,
     required this.hintText,
-    required this.labelText,
+    this.labelText,
     this.keyboardType,
     this.textInputAction,
     this.obscureText = false,
@@ -17,7 +17,7 @@ class AppTextField extends StatelessWidget {
   });
   final TextEditingController? controller;
   final String hintText;
-  final String labelText;
+  final String? labelText;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
   final bool obscureText;
@@ -30,8 +30,7 @@ class AppTextField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(labelText),
-        SizedBox(height: 6),
+        if (labelText != null) ...[Text(labelText!), SizedBox(height: 6)],
         Container(
           color: Colors.white,
           child: TextFormField(

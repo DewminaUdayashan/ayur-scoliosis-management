@@ -1,5 +1,6 @@
 import 'package:ayur_scoliosis_management/models/page/page.dart';
 import 'package:ayur_scoliosis_management/pages/practitioner/dashboard/practitioner_dashboard.dart';
+import 'package:ayur_scoliosis_management/pages/practitioner/patients/practitioner_patients.dart';
 import 'package:flutter/material.dart' hide Page;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -19,7 +20,7 @@ List<Page> page(Ref ref) {
       id: 2,
       label: 'Patients',
       icon: Icons.people_alt_sharp,
-      page: Center(child: Text('Patients Screen')),
+      page: PractitionerPatients(),
     ),
     Page(
       id: 3,

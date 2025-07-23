@@ -1,0 +1,74 @@
+import 'package:ayur_scoliosis_management/core/constants/size.dart';
+import 'package:ayur_scoliosis_management/core/extensions/size.dart';
+import 'package:ayur_scoliosis_management/core/extensions/theme.dart';
+import 'package:ayur_scoliosis_management/core/extensions/widgets.dart';
+import 'package:ayur_scoliosis_management/core/theme.dart';
+import 'package:ayur_scoliosis_management/widgets/app_text_field.dart';
+import 'package:ayur_scoliosis_management/widgets/patient_profile_avatar.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+class PractitionerPatients extends HookConsumerWidget {
+  const PractitionerPatients({super.key});
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return SizedBox(
+      width: context.width,
+      height: context.height,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  centerTitle: false,
+                  title: Text(
+                    'Patients',
+                    style: context.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                  backgroundColor: Colors.white,
+                  floating: true,
+                  snap: true,
+                  pinned: true,
+                ),
+                Padding(
+                  padding: horizontalPadding,
+                  child: AppTextField(hintText: 'Search patients...'),
+                ).sliverToBoxAdapter,
+                SliverList.builder(
+                  itemCount: 40,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      leading: PatientProfileAvatar(),
+                      title: Text('Patient 1'),
+                      subtitle: Text('Condition: Scoliosis'),
+                      trailing: Text('Last Visit: 2023-10-01'),
+                      onTap: () {
+                        // Navigate to patient details
+                      },
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            bottom: 20,
+            right: 20,
+            child: FloatingActionButton(
+              onPressed: () {
+                // Action to add a new patient
+              },
+              backgroundColor: AppTheme.accent,
+              child: Icon(CupertinoIcons.add, color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
