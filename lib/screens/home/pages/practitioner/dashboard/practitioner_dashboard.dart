@@ -1,8 +1,8 @@
 import 'package:ayur_scoliosis_management/core/constants/size.dart';
 import 'package:ayur_scoliosis_management/core/extensions/widgets.dart';
-import 'package:ayur_scoliosis_management/pages/practitioner/dashboard/widgets/activity_card.dart';
-import 'package:ayur_scoliosis_management/pages/practitioner/dashboard/widgets/app_bar.dart';
-import 'package:ayur_scoliosis_management/pages/practitioner/dashboard/widgets/appointment_card.dart';
+import 'package:ayur_scoliosis_management/screens/home/pages/practitioner/dashboard/widgets/activity_card.dart';
+import 'package:ayur_scoliosis_management/screens/home/pages/practitioner/dashboard/widgets/app_bar.dart';
+import 'package:ayur_scoliosis_management/screens/home/pages/practitioner/dashboard/widgets/appointment_card.dart';
 import 'package:ayur_scoliosis_management/widgets/page_title.dart';
 import 'package:ayur_scoliosis_management/widgets/sliver_sized_box.dart';
 import 'package:flutter/cupertino.dart';

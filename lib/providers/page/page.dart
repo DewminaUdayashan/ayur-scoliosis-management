@@ -1,6 +1,6 @@
 import 'package:ayur_scoliosis_management/models/page/page.dart';
-import 'package:ayur_scoliosis_management/pages/practitioner/dashboard/practitioner_dashboard.dart';
-import 'package:ayur_scoliosis_management/pages/practitioner/patients/practitioner_patients.dart';
+import 'package:ayur_scoliosis_management/screens/home/pages/practitioner/dashboard/practitioner_dashboard.dart';
+import 'package:ayur_scoliosis_management/screens/home/pages/practitioner/patients/practitioner_patients.dart';
 import 'package:flutter/material.dart' hide Page;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
