@@ -1,4 +1,3 @@
-import 'package:ayur_scoliosis_management/core/extensions/theme.dart';
 import 'package:ayur_scoliosis_management/providers/page/active_page.dart';
 import 'package:ayur_scoliosis_management/providers/page/page.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +11,7 @@ class HomeScreen extends HookConsumerWidget {
     return Scaffold(
       body: pages[ref.watch(activePageProvider)].page,
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: context.colorScheme.surface,
+        backgroundColor: Colors.white,
         onTap: ref.read(activePageProvider.notifier).setActivePage,
         currentIndex: ref.watch(activePageProvider),
         items: pages
