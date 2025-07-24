@@ -1,0 +1,1 @@
+enum SessionType { physical, remote }

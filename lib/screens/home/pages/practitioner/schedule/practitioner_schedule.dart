@@ -1,0 +1,303 @@
+import 'package:ayur_scoliosis_management/core/extensions/theme.dart';
+import 'package:ayur_scoliosis_management/core/theme.dart';
+import 'package:ayur_scoliosis_management/gen/assets.gen.dart';
+import 'package:ayur_scoliosis_management/screens/home/pages/practitioner/schedule/widgets/add_appointment_sheet.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:table_calendar/table_calendar.dart';
+
+/// Data model for a single appointment.
+class _Appointment {
+  final String title;
+  final String time;
+  final String patientName;
+  final String avatarUrl;
+  final Color color;
+
+  _Appointment({
+    required this.title,
+    required this.time,
+    required this.patientName,
+    required this.avatarUrl,
+    required this.color,
+  });
+}
+
+class PractitionerSchedule extends HookConsumerWidget {
+  const PractitionerSchedule({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // --- STATE MANAGEMENT ---
+    // Use hooks to manage the calendar's state.
+    final focusedDay = useState(DateTime.now());
+    final selectedDay = useState(DateTime.now());
+
+    // --- DUMMY DATA ---
+    // Sample data for appointments. In a real app, this would come from a provider.
+    final List<_Appointment> appointments = [
+      _Appointment(
+        title: 'Physical Therapy',
+        time: '10:00 AM',
+        patientName: 'Olivia Chen',
+        avatarUrl: Assets.images.logo, // Placeholder
+        color: Colors.blue,
+      ),
+      _Appointment(
+        title: 'Video Call',
+        time: '11:00 AM',
+        patientName: 'Benjamin Carter',
+        avatarUrl: Assets.images.logo, // Placeholder
+        color: Colors.lightBlue.shade300,
+      ),
+    ];
+
+    return Scaffold(
+      // Use Scaffold for a standard layout structure.
+      body: Stack(
+        children: [
+          CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                leading: IconButton(
+                  icon: const Icon(CupertinoIcons.back),
+                  onPressed: () {
+                    // TODO: Implement navigation
+                  },
+                ),
+                centerTitle: true,
+                title: Text(
+                  'Schedule',
+                  style: context.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                backgroundColor: Colors.white,
+                floating: true,
+                snap: true,
+                pinned: true,
+              ),
+
+              // Sliver that contains the main content.
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // --- CALENDAR CARD ---
+                      _buildCalendarCard(context, focusedDay, selectedDay),
+                      const SizedBox(height: 24),
+
+                      // --- APPOINTMENTS HEADER ---
+                      Text(
+                        'Appointments for ${DateFormat.yMMMMd().format(selectedDay.value)}',
+                        style: context.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // --- APPOINTMENTS LIST ---
+                      ListView.separated(
+                        itemCount: appointments.length,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 12),
+                        itemBuilder: (context, index) {
+                          return _AppointmentCard(
+                            appointment: appointments[index],
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          // --- FLOATING ACTION BUTTON ---
+          Positioned(
+            bottom: 20,
+            right: 20,
+            child: FloatingActionButton(
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  // This makes the sheet scrollable and avoids keyboard overlap
+                  isScrollControlled: true,
+                  // Use a transparent background to see the rounded corners
+                  backgroundColor: Colors.transparent,
+                  builder: (context) {
+                    return Container(
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(24.0),
+                          topRight: Radius.circular(24.0),
+                        ),
+                      ),
+                      child: const AddAppointmentSheet(),
+                    );
+                  },
+                );
+              },
+              backgroundColor: AppTheme.accent,
+              child: const Icon(CupertinoIcons.add, color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Builds the calendar card widget.
+  Widget _buildCalendarCard(
+    BuildContext context,
+    ValueNotifier<DateTime> focusedDay,
+    ValueNotifier<DateTime> selectedDay,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(12.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withAlpha(10),
+            spreadRadius: 2,
+            blurRadius: 10,
+          ),
+        ],
+      ),
+      child: TableCalendar(
+        firstDay: DateTime.utc(2020, 1, 1),
+        lastDay: DateTime.utc(2030, 12, 31),
+        focusedDay: focusedDay.value,
+        calendarFormat: CalendarFormat.month,
+        selectedDayPredicate: (day) => isSameDay(selectedDay.value, day),
+        onDaySelected: (newSelectedDay, newFocusedDay) {
+          selectedDay.value = newSelectedDay;
+          focusedDay.value = newFocusedDay;
+        },
+        onPageChanged: (newFocusedDay) {
+          focusedDay.value = newFocusedDay;
+        },
+        // --- UI CUSTOMIZATION ---
+        headerStyle: HeaderStyle(
+          titleCentered: true,
+          formatButtonVisible: false,
+          titleTextStyle: context.textTheme.titleMedium!.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+          leftChevronIcon: const Icon(
+            CupertinoIcons.chevron_left,
+            color: Colors.grey,
+          ),
+          rightChevronIcon: const Icon(
+            CupertinoIcons.chevron_right,
+            color: Colors.grey,
+          ),
+        ),
+        calendarStyle: CalendarStyle(
+          // Style for the selected day
+          selectedDecoration: BoxDecoration(
+            color: AppTheme.accent,
+            shape: BoxShape.circle,
+          ),
+          // Style for today
+          todayDecoration: BoxDecoration(
+            color: AppTheme.accent.withAlpha(30),
+            shape: BoxShape.circle,
+          ),
+          // Style for markers (dots under the date)
+          markerDecoration: BoxDecoration(
+            color: AppTheme.accent.withAlpha(70),
+            shape: BoxShape.circle,
+          ),
+        ),
+        // Provides markers for days with events
+        eventLoader: (day) {
+          // In a real app, you would check if this day has appointments
+          if (day.day == 11 ||
+              day.day == 17 ||
+              day.day == 21 ||
+              day.day == 27 ||
+              day.day == 28) {
+            return ['event'];
+          }
+          return [];
+        },
+      ),
+    );
+  }
+}
+
+/// A card widget to display a single appointment.
+class _AppointmentCard extends StatelessWidget {
+  const _AppointmentCard({required this.appointment});
+  final _Appointment appointment;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withAlpha(8),
+            spreadRadius: 1,
+            blurRadius: 8,
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Colored vertical bar
+          Container(
+            width: 5,
+            height: 50,
+            decoration: BoxDecoration(
+              color: appointment.color,
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          const SizedBox(width: 16),
+          // Appointment details
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                appointment.title,
+                style: context.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '${appointment.time} - ${appointment.patientName}',
+                style: context.textTheme.bodyMedium?.copyWith(
+                  color: Colors.grey.shade600,
+                ),
+              ),
+            ],
+          ),
+          const Spacer(),
+          // Patient avatar
+          CircleAvatar(
+            radius: 24,
+            backgroundImage: AssetImage(appointment.avatarUrl),
+          ),
+        ],
+      ),
+    );
+  }
+}
