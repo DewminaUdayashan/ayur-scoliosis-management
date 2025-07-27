@@ -4,6 +4,7 @@ import 'package:ayur_scoliosis_management/core/extensions/size.dart';
 import 'package:ayur_scoliosis_management/core/extensions/theme.dart';
 import 'package:ayur_scoliosis_management/core/extensions/widgets.dart';
 import 'package:ayur_scoliosis_management/core/theme.dart';
+import 'package:ayur_scoliosis_management/screens/home/pages/practitioner/patients/widgets/invite_patient_sheet.dart';
 import 'package:ayur_scoliosis_management/widgets/app_text_field.dart';
 import 'package:ayur_scoliosis_management/widgets/patient_profile_avatar.dart';
 import 'package:flutter/cupertino.dart';
@@ -64,7 +65,23 @@ class PractitionerPatients extends HookConsumerWidget {
             right: 20,
             child: FloatingActionButton(
               onPressed: () {
-                // Action to add a new patient
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true, // Important for keyboard handling
+                  backgroundColor: Colors.transparent,
+                  builder: (context) {
+                    return Container(
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(24.0),
+                          topRight: Radius.circular(24.0),
+                        ),
+                      ),
+                      child: const InvitePatientSheet(),
+                    );
+                  },
+                );
               },
               backgroundColor: AppTheme.accent,
               child: Icon(CupertinoIcons.add, color: Colors.white),
