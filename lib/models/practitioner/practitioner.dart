@@ -1,35 +1,33 @@
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-part 'patient.g.dart';
+part 'practitioner.g.dart';
 
 @JsonSerializable()
-class Patient extends Equatable {
+class Practitioner extends Equatable {
   final String id;
   final String firstName;
   final String lastName;
   final String email;
   final String passwordHash;
-  final String? profileImageUrl;
-  final DateTime dateOfBirth;
-  final String gender;
+  final String phone;
+  final String specialty;
   final String clinicId;
 
-  const Patient({
+  const Practitioner({
     required this.id,
     required this.firstName,
     required this.lastName,
     required this.email,
     required this.passwordHash,
-    this.profileImageUrl,
-    required this.dateOfBirth,
-    required this.gender,
+    required this.phone,
+    required this.specialty,
     required this.clinicId,
   });
 
-  factory Patient.fromJson(Map<String, dynamic> json) =>
-      _$PatientFromJson(json);
-  Map<String, dynamic> toJson() => _$PatientToJson(this);
+  factory Practitioner.fromJson(Map<String, dynamic> json) =>
+      _$PractitionerFromJson(json);
+  Map<String, dynamic> toJson() => _$PractitionerToJson(this);
 
   @override
   List<Object?> get props => [id];

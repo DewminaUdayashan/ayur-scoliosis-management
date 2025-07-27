@@ -24,12 +24,50 @@ class AddAppointmentSheet extends HookWidget {
 
     // --- DUMMY DATA ---
     final List<Patient> patients = [
-      const Patient(id: '1', name: 'Olivia Chen'),
-      const Patient(id: '2', name: 'Benjamin Carter'),
-      const Patient(id: '3', name: 'Sophia Rodriguez'),
-      const Patient(id: '4', name: 'Liam Goldberg'),
-      const Patient(id: '5', name: 'Ava Nguyen'),
-      const Patient(id: '6', name: 'Noah Patel'),
+      Patient(
+        id: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
+        firstName: 'Anusha',
+        lastName: 'Perera',
+        email: 'anusha.p@example.com',
+        passwordHash: 'hashed_password_123',
+        profileImageUrl: 'https://i.pravatar.cc/150?img=5',
+        dateOfBirth: DateTime(1998, 5, 12),
+        gender: 'Female',
+        clinicId: 'clinic_abc_123',
+      ),
+      Patient(
+        id: 'b2c3d4e5-f6a7-8901-2345-67890abcdef1',
+        firstName: 'Bhanuka',
+        lastName: 'Silva',
+        email: 'bhanuka.s@example.com',
+        passwordHash: 'hashed_password_456',
+        profileImageUrl: 'https://i.pravatar.cc/150?img=12',
+        dateOfBirth: DateTime(2001, 9, 23),
+        gender: 'Male',
+        clinicId: 'clinic_abc_123',
+      ),
+      Patient(
+        id: 'c3d4e5f6-a7b8-9012-3456-7890abcdef2',
+        firstName: 'Chamari',
+        lastName: 'Fernando',
+        email: 'chamari.f@example.com',
+        passwordHash: 'hashed_password_789',
+        profileImageUrl: 'https://i.pravatar.cc/150?img=32',
+        dateOfBirth: DateTime(1995, 2, 8),
+        gender: 'Female',
+        clinicId: 'clinic_xyz_789',
+      ),
+      Patient(
+        id: 'd4e5f6a7-b8c9-0123-4567-890abcdef3',
+        firstName: 'Dinesh',
+        lastName: 'Bandara',
+        email: 'dinesh.b@example.com',
+        passwordHash: 'hashed_password_101',
+        profileImageUrl: null, // Example with no profile image
+        dateOfBirth: DateTime(2003, 11, 30),
+        gender: 'Male',
+        clinicId: 'clinic_abc_123',
+      ),
     ];
 
     // --- FORM SUBMISSION LOGIC (Unchanged) ---
@@ -110,12 +148,13 @@ class AddAppointmentSheet extends HookWidget {
                   suggestionsBuilder: (context, controller) {
                     final query = controller.text.toLowerCase();
                     final filteredPatients = patients.where(
-                      (patient) => patient.name.toLowerCase().contains(query),
+                      (patient) =>
+                          patient.firstName.toLowerCase().contains(query),
                     );
 
                     return filteredPatients.map((patient) {
                       return ListTile(
-                        title: Text(patient.name),
+                        title: Text(patient.firstName),
                         onTap: () {
                           // When a patient is tapped:
                           selectedPatient.value = patient;
@@ -123,7 +162,7 @@ class AddAppointmentSheet extends HookWidget {
                             patient,
                           ); // Update the FormField
                           controller.closeView(
-                            patient.name,
+                            patient.firstName,
                           ); // Close search and set text
                         },
                       );

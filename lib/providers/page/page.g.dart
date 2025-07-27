@@ -6,7 +6,7 @@ part of 'page.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$pageHash() => r'8165881cd753051548667969a94374071bbbc118';
+String _$pageHash() => r'75949b83a5883c0d32fbd416c8ac1dde0bfa65e5';
 
 /// See also [page].
 @ProviderFor(page)
