@@ -1,16 +1,17 @@
-import 'package:ayur_scoliosis_management/models/page/page.dart';
-import 'package:ayur_scoliosis_management/screens/home/pages/practitioner/dashboard/practitioner_dashboard.dart';
-import 'package:ayur_scoliosis_management/screens/home/pages/practitioner/patients/practitioner_patients.dart';
-import 'package:ayur_scoliosis_management/screens/home/pages/practitioner/schedule/practitioner_schedule.dart';
 import 'package:flutter/material.dart' hide Page;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../models/page/page.dart';
+import '../../screens/home/pages/practitioner/dashboard/practitioner_dashboard.dart';
+import '../../screens/home/pages/practitioner/patients/practitioner_patients.dart';
+import '../../screens/home/pages/practitioner/schedule/practitioner_schedule.dart';
 
 part 'page.g.dart';
 
 @riverpod
 List<Page> page(Ref ref) {
-  return [
+  final practitionerPages = [
     Page(
       id: 1,
       label: 'Dashboard',
@@ -30,4 +31,5 @@ List<Page> page(Ref ref) {
       page: PractitionerSchedule(),
     ),
   ];
+  return practitionerPages;
 }

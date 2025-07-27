@@ -1,7 +1,8 @@
-import 'package:ayur_scoliosis_management/providers/page/active_page.dart';
-import 'package:ayur_scoliosis_management/providers/page/page.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import '../../providers/page/active_page.dart';
+import '../../providers/page/page.dart';
 
 class HomeScreen extends HookConsumerWidget {
   const HomeScreen({super.key});

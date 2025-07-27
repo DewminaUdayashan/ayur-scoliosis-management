@@ -1,6 +1,7 @@
-import 'package:ayur_scoliosis_management/core/extensions/theme.dart';
-import 'package:ayur_scoliosis_management/core/theme.dart';
 import 'package:flutter/material.dart';
+
+import '../core/extensions/theme.dart';
+import '../core/theme.dart';
 
 class AppTextField extends StatelessWidget {
   const AppTextField({

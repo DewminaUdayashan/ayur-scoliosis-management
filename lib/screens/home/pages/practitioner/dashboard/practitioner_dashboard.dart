@@ -1,13 +1,14 @@
-import 'package:ayur_scoliosis_management/core/constants/size.dart';
-import 'package:ayur_scoliosis_management/core/extensions/widgets.dart';
-import 'package:ayur_scoliosis_management/screens/home/pages/practitioner/dashboard/widgets/activity_card.dart';
-import 'package:ayur_scoliosis_management/screens/home/pages/practitioner/dashboard/widgets/app_bar.dart';
-import 'package:ayur_scoliosis_management/screens/home/pages/practitioner/dashboard/widgets/appointment_card.dart';
-import 'package:ayur_scoliosis_management/widgets/page_title.dart';
-import 'package:ayur_scoliosis_management/widgets/sliver_sized_box.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import '../../../../../core/constants/size.dart';
+import '../../../../../core/extensions/widgets.dart';
+import '../../../../../widgets/page_title.dart';
+import '../../../../../widgets/sliver_sized_box.dart';
+import 'widgets/activity_card.dart';
+import 'widgets/app_bar.dart';
+import 'widgets/appointment_card.dart';
 
 class PractitionerDashboard extends HookConsumerWidget {
   const PractitionerDashboard({super.key});

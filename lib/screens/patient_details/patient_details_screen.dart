@@ -1,17 +1,18 @@
-import 'package:ayur_scoliosis_management/core/constants/size.dart';
-import 'package:ayur_scoliosis_management/core/extensions/size.dart';
-import 'package:ayur_scoliosis_management/core/extensions/widgets.dart';
-import 'package:ayur_scoliosis_management/core/theme.dart';
-import 'package:ayur_scoliosis_management/screens/patient_details/widgets/patient_documents_tab.dart';
-import 'package:ayur_scoliosis_management/screens/patient_details/widgets/patient_profile_tab.dart';
-import 'package:ayur_scoliosis_management/screens/patient_details/widgets/patient_timeline_tab.dart';
-import 'package:ayur_scoliosis_management/widgets/patient_profile_avatar.dart';
-import 'package:ayur_scoliosis_management/widgets/sliver_sized_box.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import '../../core/constants/size.dart';
+import '../../core/extensions/size.dart';
+import '../../core/extensions/widgets.dart';
+import '../../core/theme.dart';
+import '../../widgets/patient_profile_avatar.dart';
+import '../../widgets/sliver_sized_box.dart';
+import 'widgets/patient_documents_tab.dart';
+import 'widgets/patient_profile_tab.dart';
+import 'widgets/patient_timeline_tab.dart';
 
 class PatientDetailsScreen extends HookConsumerWidget {
   const PatientDetailsScreen({super.key, required this.patientId});

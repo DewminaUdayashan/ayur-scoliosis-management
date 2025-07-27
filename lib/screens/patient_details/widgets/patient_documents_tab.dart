@@ -1,5 +1,6 @@
-import 'package:ayur_scoliosis_management/gen/assets.gen.dart';
 import 'package:flutter/material.dart';
+
+import '../../../gen/assets.gen.dart';
 
 class PatientDocumentsTab extends StatelessWidget {
   const PatientDocumentsTab({super.key});

@@ -1,10 +1,11 @@
-import 'package:ayur_scoliosis_management/screens/auth/login_screen.dart';
-import 'package:ayur_scoliosis_management/screens/auth/otp_verification_screen.dart';
-import 'package:ayur_scoliosis_management/screens/home/home_screen.dart';
-import 'package:ayur_scoliosis_management/screens/patient_details/patient_details_screen.dart';
-import 'package:ayur_scoliosis_management/screens/splash/splash_screen.dart';
 import 'package:flutter/material.dart' show NavigatorState, GlobalKey;
 import 'package:go_router/go_router.dart';
+
+import '../screens/auth/login_screen.dart';
+import '../screens/auth/otp_verification_screen.dart';
+import '../screens/home/home_screen.dart';
+import '../screens/patient_details/patient_details_screen.dart';
+import '../screens/splash/splash_screen.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 

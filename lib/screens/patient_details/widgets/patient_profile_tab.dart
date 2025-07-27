@@ -1,6 +1,7 @@
-import 'package:ayur_scoliosis_management/core/extensions/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import '../../../core/extensions/theme.dart';
 
 class PatientProfileTab extends HookConsumerWidget {
   const PatientProfileTab({super.key});

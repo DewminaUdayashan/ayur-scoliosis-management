@@ -1,6 +1,7 @@
-import 'package:ayur_scoliosis_management/core/extensions/theme.dart';
-import 'package:ayur_scoliosis_management/core/extensions/widgets.dart';
 import 'package:flutter/material.dart';
+
+import '../core/extensions/theme.dart';
+import '../core/extensions/widgets.dart';
 
 class PageTitle extends StatelessWidget {
   const PageTitle({super.key, required this.title});

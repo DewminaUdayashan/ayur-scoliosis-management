@@ -1,13 +1,14 @@
-import 'package:ayur_scoliosis_management/core/extensions/theme.dart';
-import 'package:ayur_scoliosis_management/core/theme.dart';
-import 'package:ayur_scoliosis_management/gen/assets.gen.dart';
-import 'package:ayur_scoliosis_management/screens/home/pages/practitioner/schedule/widgets/add_appointment_sheet.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
+
+import '../../../../../core/extensions/theme.dart';
+import '../../../../../core/theme.dart';
+import '../../../../../gen/assets.gen.dart';
+import 'widgets/add_appointment_sheet.dart';
 
 /// Data model for a single appointment.
 class _Appointment {

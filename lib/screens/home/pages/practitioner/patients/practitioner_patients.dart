@@ -1,16 +1,17 @@
-import 'package:ayur_scoliosis_management/core/app_router.dart';
-import 'package:ayur_scoliosis_management/core/constants/size.dart';
-import 'package:ayur_scoliosis_management/core/extensions/size.dart';
-import 'package:ayur_scoliosis_management/core/extensions/theme.dart';
-import 'package:ayur_scoliosis_management/core/extensions/widgets.dart';
-import 'package:ayur_scoliosis_management/core/theme.dart';
-import 'package:ayur_scoliosis_management/screens/home/pages/practitioner/patients/widgets/invite_patient_sheet.dart';
-import 'package:ayur_scoliosis_management/widgets/app_text_field.dart';
-import 'package:ayur_scoliosis_management/widgets/patient_profile_avatar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import '../../../../../core/app_router.dart';
+import '../../../../../core/constants/size.dart';
+import '../../../../../core/extensions/size.dart';
+import '../../../../../core/extensions/theme.dart';
+import '../../../../../core/extensions/widgets.dart';
+import '../../../../../core/theme.dart';
+import '../../../../../widgets/app_text_field.dart';
+import '../../../../../widgets/patient_profile_avatar.dart';
+import 'widgets/invite_patient_sheet.dart';
 
 class PractitionerPatients extends HookConsumerWidget {
   const PractitionerPatients({super.key});

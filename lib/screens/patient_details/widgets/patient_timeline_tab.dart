@@ -1,6 +1,7 @@
-import 'package:ayur_scoliosis_management/core/theme.dart';
-import 'package:ayur_scoliosis_management/gen/assets.gen.dart';
 import 'package:flutter/material.dart';
+
+import '../../../core/theme.dart';
+import '../../../gen/assets.gen.dart';
 
 // Assuming you have this extension from the previous example
 extension ThemeContext on BuildContext {

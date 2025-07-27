@@ -1,16 +1,17 @@
-import 'package:ayur_scoliosis_management/core/app_router.dart';
-import 'package:ayur_scoliosis_management/core/constants/size.dart';
-import 'package:ayur_scoliosis_management/core/extensions/size.dart';
-import 'package:ayur_scoliosis_management/core/extensions/theme.dart';
-import 'package:ayur_scoliosis_management/core/extensions/validators.dart';
-import 'package:ayur_scoliosis_management/core/extensions/value_notifier.dart';
-import 'package:ayur_scoliosis_management/gen/assets.gen.dart';
-import 'package:ayur_scoliosis_management/widgets/app_text_field.dart';
-import 'package:ayur_scoliosis_management/widgets/buttons/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import '../../core/app_router.dart';
+import '../../core/constants/size.dart';
+import '../../core/extensions/size.dart';
+import '../../core/extensions/theme.dart';
+import '../../core/extensions/validators.dart';
+import '../../core/extensions/value_notifier.dart';
+import '../../gen/assets.gen.dart';
+import '../../widgets/app_text_field.dart';
+import '../../widgets/buttons/primary_button.dart';
 
 class LoginScreen extends HookConsumerWidget {
   const LoginScreen({super.key});

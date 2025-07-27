@@ -1,7 +1,8 @@
-import 'package:ayur_scoliosis_management/core/app_router.dart';
-import 'package:ayur_scoliosis_management/core/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import 'core/app_router.dart';
+import 'core/theme.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

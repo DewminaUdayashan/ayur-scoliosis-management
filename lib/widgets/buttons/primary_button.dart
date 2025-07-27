@@ -1,9 +1,10 @@
 import 'dart:math';
 
-import 'package:ayur_scoliosis_management/core/constants/size.dart';
-import 'package:ayur_scoliosis_management/core/extensions/theme.dart';
-import 'package:ayur_scoliosis_management/core/theme.dart';
 import 'package:flutter/material.dart';
+
+import '../../core/constants/size.dart';
+import '../../core/extensions/theme.dart';
+import '../../core/theme.dart';
 
 class PrimaryButton extends StatefulWidget {
   const PrimaryButton({

@@ -1,6 +1,7 @@
-import 'package:ayur_scoliosis_management/core/enums.dart' show EventType;
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
+
+import '../../core/enums.dart' show EventType;
 
 part 'patient_event.g.dart';
 
