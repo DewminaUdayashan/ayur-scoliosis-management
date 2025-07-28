@@ -20,6 +20,7 @@ class PatientDashboard extends HookConsumerWidget {
           PatientAppBar(),
           SliverSizedBox(height: 20),
           PageTitle(title: 'Your Next Appointment'),
+          NextAppointmentCard(isRemote: true).sliverToBoxAdapter,
           NextAppointmentCard().sliverToBoxAdapter,
           SliverSizedBox(height: 20),
           PageTitle(title: 'Recent Instructions'),

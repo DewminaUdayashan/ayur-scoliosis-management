@@ -6,7 +6,8 @@ import '../../../../../../core/extensions/theme.dart';
 import '../../../../../../core/theme.dart';
 
 class NextAppointmentCard extends StatelessWidget {
-  const NextAppointmentCard({super.key});
+  const NextAppointmentCard({super.key, this.isRemote = false});
+  final bool isRemote;
 
   @override
   Widget build(BuildContext context) {
@@ -17,17 +18,26 @@ class NextAppointmentCard extends StatelessWidget {
       child: ListTile(
         tileColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: radius8),
-        leading: const CircleAvatar(
+        leading: CircleAvatar(
           backgroundColor: AppTheme.primary,
           child: Icon(
-            CupertinoIcons.video_camera_solid,
-            color: AppTheme.primary,
+            isRemote
+                ? CupertinoIcons.video_camera_solid
+                : CupertinoIcons.building_2_fill,
+            color: Colors.white,
             size: 20,
           ),
         ),
-        title: const Text('Video Call with Dr. John Doe'),
+        title: Text(
+          isRemote
+              ? 'Video Call with Dr. John Doe'
+              : 'In-Person Appointment with Dr. John Doe',
+          style: context.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         subtitle: Text(
-          '10:00 AM - July 28, 2025',
+          isRemote ? '11:00 AM - July 20, 2025' : '10:00 AM - July 28, 2025',
           style: context.textTheme.bodyMedium?.copyWith(
             color: AppTheme.textSecondary,
           ),
