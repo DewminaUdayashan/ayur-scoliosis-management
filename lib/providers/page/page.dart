@@ -1,3 +1,5 @@
+import 'package:ayur_scoliosis_management/screens/home/pages/patient/dashboard/patient_dashboard.dart';
+import 'package:ayur_scoliosis_management/screens/home/pages/patient/schedule/patient_schedule.dart';
 import 'package:flutter/material.dart' hide Page;
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -31,5 +33,15 @@ List<Page> page(Ref ref) {
       page: PractitionerSchedule(),
     ),
   ];
-  return practitionerPages;
+  final patientPages = [
+    Page(id: 1, label: 'Dashboard', icon: Icons.home, page: PatientDashboard()),
+    Page(
+      id: 2,
+      label: 'Schedule ',
+      icon: Icons.calendar_month,
+      page: PatientSchedule(),
+    ),
+    // Add other patient pages here
+  ];
+  return patientPages;
 }
