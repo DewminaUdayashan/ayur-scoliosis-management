@@ -61,63 +61,65 @@ class PatientSchedule extends HookConsumerWidget {
       ),
     ];
 
-    return Padding(
-      padding: horizontalPadding,
-      child: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            centerTitle: true,
-            title: Text(
-              'My Schedule',
-              style: context.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
+    return Scaffold(
+      body: Padding(
+        padding: horizontalPadding,
+        child: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              centerTitle: true,
+              title: Text(
+                'My Schedule',
+                style: context.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
               ),
+              backgroundColor: Colors.white,
+              floating: true,
+              snap: true,
+              pinned: true,
             ),
-            backgroundColor: Colors.white,
-            floating: true,
-            snap: true,
-            pinned: true,
-          ),
-          SliverToBoxAdapter(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 24),
-                // --- CALENDAR CARD ---
-                PatientCalendar(
-                  onDaySelected: (day) {
-                    selectedDay.value = day;
-                  },
-                ),
-                const SizedBox(height: 24),
-                // --- APPOINTMENTS HEADER ---
-                Text(
-                  'Appointments for ${DateFormat.yMMMMd().format(selectedDay.value)}',
-                  style: context.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                // --- APPOINTMENTS LIST ---
-                if (appointments.isEmpty)
-                  const Center(child: Text('No appointments for this day.'))
-                else
-                  ListView.separated(
-                    itemCount: appointments.length,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: 12),
-                    itemBuilder: (context, index) {
-                      return _PatientAppointmentCard(
-                        appointment: appointments[index],
-                      );
+            SliverToBoxAdapter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 24),
+                  // --- CALENDAR CARD ---
+                  PatientCalendar(
+                    onDaySelected: (day) {
+                      selectedDay.value = day;
                     },
                   ),
-              ],
+                  const SizedBox(height: 24),
+                  // --- APPOINTMENTS HEADER ---
+                  Text(
+                    'Appointments for ${DateFormat.yMMMMd().format(selectedDay.value)}',
+                    style: context.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  // --- APPOINTMENTS LIST ---
+                  if (appointments.isEmpty)
+                    const Center(child: Text('No appointments for this day.'))
+                  else
+                    ListView.separated(
+                      itemCount: appointments.length,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 12),
+                      itemBuilder: (context, index) {
+                        return _PatientAppointmentCard(
+                          appointment: appointments[index],
+                        );
+                      },
+                    ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

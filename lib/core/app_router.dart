@@ -1,3 +1,4 @@
+import 'package:ayur_scoliosis_management/screens/appointment_details/appointment_details_screen.dart';
 import 'package:flutter/material.dart' show NavigatorState, GlobalKey;
 import 'package:go_router/go_router.dart';
 
@@ -19,6 +20,9 @@ class AppRouter {
 
   static const patientDetails = '$home/patients/patient-details';
   static const _patientDetailsPath = 'patients/patient-details';
+
+  static const appointmentDetails = '$home/appointment-details';
+  static const _appointmentDetailsPath = 'appointment-details';
 
   static final routes = GoRouter(
     initialLocation: home,
@@ -53,6 +57,13 @@ class AppRouter {
             builder: (context, state) {
               final id = (state.extra as Map?)?['id'];
               return PatientDetailsScreen(patientId: id);
+            },
+          ),
+          GoRoute(
+            path: _appointmentDetailsPath,
+            builder: (context, state) {
+              final id = (state.extra as Map?)?['id'];
+              return AppointmentDetailsScreen(appointmentId: id);
             },
           ),
         ],

@@ -1,5 +1,7 @@
+import 'package:ayur_scoliosis_management/core/app_router.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../../../core/constants/size.dart' show radius8;
 import '../../../../../../core/extensions/theme.dart';
@@ -50,7 +52,12 @@ class NextAppointmentCard extends StatelessWidget {
           fontWeight: FontWeight.w600,
         ),
         onTap: () {
-          // Navigate to appointment details
+          context.push(
+            AppRouter.appointmentDetails,
+            extra: {
+              'id': '12345', // Example appointment ID
+            },
+          );
         },
       ),
     );
