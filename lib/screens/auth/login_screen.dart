@@ -110,6 +110,28 @@ class LoginScreen extends HookConsumerWidget {
                   // Perform login logic here
                 },
               ),
+              TextButton(
+                onPressed: () {
+                  context.push(
+                    AppRouter.registration,
+                  ); // Assuming you add this route
+                },
+                child: Text.rich(
+                  TextSpan(
+                    text: 'Are you a practitioner? ',
+                    style: context.textTheme.bodyMedium,
+                    children: [
+                      TextSpan(
+                        text: 'Register here',
+                        style: context.textTheme.bodyMedium?.copyWith(
+                          color: context.primaryColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               // FilledButton(
               //   onPressed: () {
               //     // Handle login action

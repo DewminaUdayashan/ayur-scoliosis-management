@@ -8,7 +8,9 @@ part of 'clinic.dart';
 
 Clinic _$ClinicFromJson(Map<String, dynamic> json) => Clinic(
   id: json['id'] as String,
+  registrationId: json['registrationId'] as String,
   name: json['name'] as String,
+  imageUrl: json['imageUrl'] as String?,
   addressLine1: json['addressLine1'] as String,
   addressLine2: json['addressLine2'] as String,
   city: json['city'] as String,
@@ -18,7 +20,9 @@ Clinic _$ClinicFromJson(Map<String, dynamic> json) => Clinic(
 
 Map<String, dynamic> _$ClinicToJson(Clinic instance) => <String, dynamic>{
   'id': instance.id,
+  'registrationId': instance.registrationId,
   'name': instance.name,
+  'imageUrl': instance.imageUrl,
   'addressLine1': instance.addressLine1,
   'addressLine2': instance.addressLine2,
   'city': instance.city,

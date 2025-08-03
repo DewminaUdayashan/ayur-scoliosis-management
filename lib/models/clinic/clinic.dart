@@ -6,7 +6,9 @@ part 'clinic.g.dart';
 @JsonSerializable()
 class Clinic extends Equatable {
   final String id;
+  final String registrationId;
   final String name;
+  final String? imageUrl;
   final String addressLine1;
   final String addressLine2;
   final String city;
@@ -15,7 +17,9 @@ class Clinic extends Equatable {
 
   const Clinic({
     required this.id,
+    required this.registrationId,
     required this.name,
+    this.imageUrl,
     required this.addressLine1,
     required this.addressLine2,
     required this.city,
@@ -27,5 +31,5 @@ class Clinic extends Equatable {
   Map<String, dynamic> toJson() => _$ClinicToJson(this);
 
   @override
-  List<Object?> get props => [id];
+  List<Object?> get props => [id, registrationId];
 }

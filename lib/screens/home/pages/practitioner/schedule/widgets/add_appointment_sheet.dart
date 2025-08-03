@@ -35,6 +35,7 @@ class AddAppointmentSheet extends HookWidget {
         dateOfBirth: DateTime(1998, 5, 12),
         gender: 'Female',
         clinicId: 'clinic_abc_123',
+        role: UserRole.patient,
       ),
       Patient(
         id: 'b2c3d4e5-f6a7-8901-2345-67890abcdef1',
@@ -46,6 +47,7 @@ class AddAppointmentSheet extends HookWidget {
         dateOfBirth: DateTime(2001, 9, 23),
         gender: 'Male',
         clinicId: 'clinic_abc_123',
+        role: UserRole.patient,
       ),
       Patient(
         id: 'c3d4e5f6-a7b8-9012-3456-7890abcdef2',
@@ -57,6 +59,7 @@ class AddAppointmentSheet extends HookWidget {
         dateOfBirth: DateTime(1995, 2, 8),
         gender: 'Female',
         clinicId: 'clinic_xyz_789',
+        role: UserRole.patient,
       ),
       Patient(
         id: 'd4e5f6a7-b8c9-0123-4567-890abcdef3',
@@ -68,6 +71,7 @@ class AddAppointmentSheet extends HookWidget {
         dateOfBirth: DateTime(2003, 11, 30),
         gender: 'Male',
         clinicId: 'clinic_abc_123',
+        role: UserRole.patient,
       ),
     ];
 

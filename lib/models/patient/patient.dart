@@ -1,26 +1,25 @@
-import 'package:equatable/equatable.dart';
+import 'package:ayur_scoliosis_management/core/enums.dart';
+import 'package:ayur_scoliosis_management/models/auth/app_user.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'patient.g.dart';
 
 @JsonSerializable()
-class Patient extends Equatable {
-  final String id;
-  final String firstName;
-  final String lastName;
-  final String email;
-  final String passwordHash;
+class Patient extends AppUser {
   final String? profileImageUrl;
   final DateTime dateOfBirth;
   final String gender;
   final String clinicId;
 
   const Patient({
-    required this.id,
-    required this.firstName,
-    required this.lastName,
-    required this.email,
-    required this.passwordHash,
+    // Common fields passed to the super class
+    required super.id,
+    required super.firstName,
+    required super.lastName,
+    required super.email,
+    required super.passwordHash,
+    required super.role,
+    // Patient-specific fields
     this.profileImageUrl,
     required this.dateOfBirth,
     required this.gender,
@@ -29,8 +28,6 @@ class Patient extends Equatable {
 
   factory Patient.fromJson(Map<String, dynamic> json) =>
       _$PatientFromJson(json);
-  Map<String, dynamic> toJson() => _$PatientToJson(this);
-
   @override
-  List<Object?> get props => [id];
+  Map<String, dynamic> toJson() => _$PatientToJson(this);
 }

@@ -47,3 +47,21 @@ enum AIClassificationType {
   @JsonValue('AnalysisFailed')
   analysisFailed,
 }
+
+enum UserRole {
+  @JsonValue('Patient')
+  patient,
+  @JsonValue('Practitioner')
+  practitioner,
+}
+
+enum AccountStatus {
+  @JsonValue('Pending')
+  pending,
+  @JsonValue('Active')
+  active,
+  @JsonValue('Inactive')
+  inactive,
+  @JsonValue('Suspended')
+  suspended,
+}
