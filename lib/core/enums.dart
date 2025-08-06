@@ -65,3 +65,20 @@ enum AccountStatus {
   @JsonValue('Suspended')
   suspended,
 }
+
+@JsonEnum(valueField: 'code')
+enum ApiResponseCode {
+  registrationSuccess('REGISTRATION_SUCCESS');
+
+  const ApiResponseCode(this.code);
+  final String code;
+}
+
+enum AuthStatus {
+  loading,
+  authenticated,
+  unauthenticated,
+  unknown,
+  passwordMustSetup,
+  pendingActivation,
+}
