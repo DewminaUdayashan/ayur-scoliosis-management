@@ -9,6 +9,7 @@ class AppTextFormField extends StatelessWidget {
     this.controller,
     this.keyboardType,
     this.textInputAction = TextInputAction.next,
+    this.onTap,
   });
 
   final String labelText;
@@ -17,6 +18,7 @@ class AppTextFormField extends StatelessWidget {
   final TextEditingController? controller;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +26,8 @@ class AppTextFormField extends StatelessWidget {
       controller: controller,
       keyboardType: keyboardType,
       textInputAction: textInputAction,
+      onTap: onTap,
+      readOnly: onTap != null,
       decoration: InputDecoration(
         labelText: labelText,
         prefixIcon: prefixIcon != null ? Icon(prefixIcon, size: 20) : null,
