@@ -17,6 +17,5 @@ class Patient {
 
   factory Patient.fromJson(Map<String, dynamic> json) =>
       _$PatientFromJson(json);
-  @override
   Map<String, dynamic> toJson() => _$PatientToJson(this);
 }

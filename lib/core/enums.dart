@@ -74,6 +74,15 @@ enum ApiResponseCode {
   final String code;
 }
 
+@JsonEnum(valueField: 'value')
+enum Gender {
+  male('Male'),
+  female('Female');
+
+  const Gender(this.value);
+  final String value;
+}
+
 enum AuthStatus {
   loading,
   authenticated,
