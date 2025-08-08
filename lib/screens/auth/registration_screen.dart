@@ -1,4 +1,5 @@
 import 'package:ayur_scoliosis_management/core/enums.dart';
+import 'package:ayur_scoliosis_management/core/extensions/snack.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -80,44 +81,20 @@ class PractitionerRegistrationScreen extends HookConsumerWidget {
             // clinicImage: null,
           );
 
-          // Validate the model
-          final validationErrors = registrationModel.validate();
-          if (validationErrors.isNotEmpty) {
-            if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Validation Error: ${validationErrors.first}'),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            }
-            return;
-          }
-
           // Call the auth provider's signUp method with the model
           await ref.read(authProvider.notifier).signUp(registrationModel);
 
           if (context.mounted) {
             // Show success message
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                  'Registration successful! Your account is pending activation.',
-                ),
-                backgroundColor: Colors.green,
-              ),
+            context.showSuccess(
+              'Registration successful! Your account is pending activation.',
             );
             context.pop();
           }
         } catch (error) {
           if (context.mounted) {
             // Show error message
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Registration failed: ${error.toString()}'),
-                backgroundColor: Colors.red,
-              ),
-            );
+            context.showError('Registration failed: ${error.toString()}');
           }
         } finally {
           isLoading.value = false;

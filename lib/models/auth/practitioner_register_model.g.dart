@@ -22,5 +22,4 @@ Map<String, dynamic> _$PractitionerRegisterModelToJson(
   'clinicCity': instance.clinicCity,
   'clinicEmail': instance.clinicEmail,
   'clinicPhone': instance.clinicPhone,
-  'isValid': instance.isValid,
 };

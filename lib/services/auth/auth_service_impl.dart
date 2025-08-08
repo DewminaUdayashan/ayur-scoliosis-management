@@ -52,20 +52,39 @@ class AuthServiceImpl extends AuthService {
         throw EmailAlreadyRegistered();
       }
     } on DioException catch (e) {
-      return e.throwProcessedException();
+      throw e.processException();
     }
   }
 
   @override
-  Future<void> signInWithEmailAndPassword(String email, String password) {
-    // TODO: implement signInWithEmailAndPassword
-    throw UnimplementedError();
+  Future<String> signInWithEmailAndPassword(
+    String email,
+    String password,
+  ) async {
+    try {
+      final response = await client.post(
+        api.signIn,
+        data: {'email': email, 'password': password},
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return response.data['access_token'];
+      } else {
+        throw Exception('Failed to sign in');
+      }
+    } on DioException catch (e) {
+      throw e.processException();
+    }
   }
 
   @override
-  Future<bool> isAuthenticated() {
-    // TODO: implement isAuthenticated
-    throw UnimplementedError();
+  Future<bool> isAuthenticated() async {
+    try {
+      final response = await client.get(api.authStatus);
+      return response.statusCode == 200;
+    } on DioException catch (e) {
+      throw e.processException();
+    }
   }
 
   @override

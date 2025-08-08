@@ -1,6 +1,6 @@
-abstract class AppApiExceptions implements Exception {
+abstract class AppApiException implements Exception {
   final String message;
-  AppApiExceptions(this.message);
+  AppApiException(this.message);
 
   @override
   String toString() {
@@ -8,10 +8,10 @@ abstract class AppApiExceptions implements Exception {
   }
 }
 
-class ApiException extends AppApiExceptions {
+class ApiException extends AppApiException {
   ApiException(super.message);
 }
 
-class EmailAlreadyRegistered extends AppApiExceptions {
+class EmailAlreadyRegistered extends AppApiException {
   EmailAlreadyRegistered() : super('A user with this email already exists.');
 }

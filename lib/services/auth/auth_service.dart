@@ -1,7 +1,7 @@
 import 'package:ayur_scoliosis_management/models/auth/practitioner_register_model.dart';
 
 abstract class AuthService {
-  Future<void> signInWithEmailAndPassword(String email, String password);
+  Future<String> signInWithEmailAndPassword(String email, String password);
 
   Future<void> signUpWithEmailAndPassword(PractitionerRegisterModel data);
 

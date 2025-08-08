@@ -1,3 +1,5 @@
+import 'package:ayur_scoliosis_management/core/extensions/snack.dart';
+import 'package:ayur_scoliosis_management/providers/auth/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
@@ -19,6 +21,7 @@ class LoginScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final formKey = useMemoized(() => GlobalKey<FormState>());
     final obscureNotifier = useState(true);
+    final isLoading = useState(false);
     final emailController = useTextEditingController();
     final passwordController = useTextEditingController();
 
@@ -78,6 +81,7 @@ class LoginScreen extends HookConsumerWidget {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your password';
                     }
+
                     return null;
                   },
                 ),
@@ -85,9 +89,7 @@ class LoginScreen extends HookConsumerWidget {
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: () {
-                    // Handle forgot password action
-                  },
+                  onPressed: () {},
                   child: Text(
                     'Forgot Password?',
                     style: context.textTheme.bodyLarge?.copyWith(
@@ -97,16 +99,27 @@ class LoginScreen extends HookConsumerWidget {
                 ),
               ),
               PrimaryButton(
-                isLoading: false,
+                isLoading: isLoading.value,
                 label: 'Login',
-                onPressed: () {
-                  context.push(AppRouter.otpVerification);
+                onPressed: () async {
                   if (formKey.currentState?.validate() != true) {
                     return;
                   }
-                  // Handle login action
-                  final email = emailController.text;
-                  final password = passwordController.text;
+                  try {
+                    isLoading.value = true;
+                    await ref
+                        .read(authProvider.notifier)
+                        .signIn(emailController.text, passwordController.text);
+                    if (context.mounted) {
+                      context.pushReplacement(AppRouter.home);
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      context.showError('Login failed: ${e.toString()}');
+                    }
+                  } finally {
+                    isLoading.value = false;
+                  }
                   // Perform login logic here
                 },
               ),
