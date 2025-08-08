@@ -12,6 +12,9 @@ Practitioner _$PractitionerFromJson(Map<String, dynamic> json) => Practitioner(
   medicalLicense: json['medicalLicense'] as String,
   status: $enumDecode(_$AccountStatusEnumMap, json['status']),
   clinicId: json['clinicId'] as String,
+  clinic: json['clinic'] == null
+      ? null
+      : Clinic.fromJson(json['clinic'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$PractitionerToJson(Practitioner instance) =>
@@ -21,6 +24,7 @@ Map<String, dynamic> _$PractitionerToJson(Practitioner instance) =>
       'medicalLicense': instance.medicalLicense,
       'status': _$AccountStatusEnumMap[instance.status]!,
       'clinicId': instance.clinicId,
+      'clinic': instance.clinic,
     };
 
 const _$AccountStatusEnumMap = {
