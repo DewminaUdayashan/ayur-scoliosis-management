@@ -1,3 +1,4 @@
+import 'package:ayur_scoliosis_management/core/enums.dart';
 import 'package:ayur_scoliosis_management/core/extensions/snack.dart';
 import 'package:ayur_scoliosis_management/providers/auth/auth.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +25,18 @@ class LoginScreen extends HookConsumerWidget {
     final isLoading = useState(false);
     final emailController = useTextEditingController();
     final passwordController = useTextEditingController();
+
+    final auth = ref.watch(authProvider).valueOrNull;
+
+    useEffect(() {
+      // If already authenticated, redirect to home
+      if (auth == AuthStatus.authenticated) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          context.go(AppRouter.home);
+        });
+      }
+      return null;
+    }, [auth]);
 
     return Scaffold(
       body: Padding(
@@ -110,9 +123,6 @@ class LoginScreen extends HookConsumerWidget {
                     await ref
                         .read(authProvider.notifier)
                         .signIn(emailController.text, passwordController.text);
-                    if (context.mounted) {
-                      context.pushReplacement(AppRouter.home);
-                    }
                   } catch (e) {
                     if (context.mounted) {
                       context.showError('Login failed: ${e.toString()}');
@@ -145,16 +155,6 @@ class LoginScreen extends HookConsumerWidget {
                   ),
                 ),
               ),
-              // FilledButton(
-              //   onPressed: () {
-              //     // Handle login action
-              //   },
-              //   style: FilledButton.styleFrom(
-              //     minimumSize: Size(double.infinity, 48),
-              //     shape: RoundedRectangleBorder(borderRadius: radiusFull),
-              //   ),
-              //   child: Text('Login'),
-              // ),
             ],
           ),
         ),
