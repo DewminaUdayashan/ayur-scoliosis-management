@@ -1,13 +1,18 @@
+import 'package:ayur_scoliosis_management/providers/profile/profile.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../../../core/extensions/theme.dart';
 import '../../../../../../core/theme.dart';
 
-class PractitionerAppBar extends StatelessWidget {
+class PractitionerAppBar extends HookConsumerWidget {
   const PractitionerAppBar({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profileAsync = ref.watch(profileProvider);
     return SliverAppBar(
       backgroundColor: Colors.white,
       title: Row(
@@ -15,19 +20,65 @@ class PractitionerAppBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          CircleAvatar(),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Text('SpineCare Clinic', style: context.textTheme.bodySmall),
-              Text(
-                'Dr. John Doe',
-                style: context.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+          profileAsync.when(
+            data: (profile) => Row(
+              spacing: 8,
+              children: [
+                CircleAvatar(
+                  backgroundImage: profile.imageUrl != null
+                      ? CachedNetworkImageProvider(profile.imageUrl!)
+                      : null,
+                  child: profile.imageUrl == null
+                      ? const Icon(
+                          CupertinoIcons.person_fill,
+                          color: AppTheme.accent,
+                        )
+                      : null,
                 ),
-              ),
-            ],
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      'SpineCare Clinic',
+                      style: context.textTheme.bodySmall,
+                    ),
+                    Text(
+                      'Dr. John Doe',
+                      style: context.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            error: (error, stack) {
+              return Row(
+                spacing: 8,
+                children: [
+                  const CircleAvatar(
+                    radius: 20,
+                    child: Icon(Icons.person, color: Colors.black),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text('SpineAlign', style: context.textTheme.bodySmall),
+                      Text(
+                        'Welcome Doctor!',
+                        style: context.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              );
+            },
+            loading: () =>
+                const CircleAvatar(radius: 20, backgroundColor: Colors.grey),
           ),
           Spacer(),
           IconButton(

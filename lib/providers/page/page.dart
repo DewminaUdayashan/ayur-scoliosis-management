@@ -43,5 +43,5 @@ List<Page> page(Ref ref) {
     ),
     // Add other patient pages here
   ];
-  return patientPages;
+  return practitionerPages;
 }

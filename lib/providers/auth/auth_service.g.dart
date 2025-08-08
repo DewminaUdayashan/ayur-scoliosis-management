@@ -1,27 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'page.dart';
+part of 'auth_service.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$pageHash() => r'4c0e8fc540e4ff84045ba33db163e83fec88d2f7';
+String _$authServiceHash() => r'c4b0fa7266d5bf82a0cd5c8b656db02b248d47a5';
 
-/// See also [page].
-@ProviderFor(page)
-final pageProvider = AutoDisposeProvider<List<Page>>.internal(
-  page,
-  name: r'pageProvider',
+/// See also [authService].
+@ProviderFor(authService)
+final authServiceProvider = AutoDisposeProvider<AuthService>.internal(
+  authService,
+  name: r'authServiceProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$pageHash,
+      : _$authServiceHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef PageRef = AutoDisposeProviderRef<List<Page>>;
+typedef AuthServiceRef = AutoDisposeProviderRef<AuthService>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

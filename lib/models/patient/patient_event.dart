@@ -7,14 +7,6 @@ part 'patient_event.g.dart';
 
 @JsonSerializable()
 class PatientEvent extends Equatable {
-  final String id;
-  final String patientId;
-  final String createdByPractitionerId;
-  final String? appointmentId;
-  final EventType eventType;
-  final DateTime eventDateTime;
-  final bool isSharedWithPatient;
-
   const PatientEvent({
     required this.id,
     required this.patientId,
@@ -24,6 +16,13 @@ class PatientEvent extends Equatable {
     required this.eventDateTime,
     required this.isSharedWithPatient,
   });
+  final String id;
+  final String patientId;
+  final String createdByPractitionerId;
+  final String? appointmentId;
+  final EventType eventType;
+  final DateTime eventDateTime;
+  final bool isSharedWithPatient;
 
   factory PatientEvent.fromJson(Map<String, dynamic> json) =>
       _$PatientEventFromJson(json);
