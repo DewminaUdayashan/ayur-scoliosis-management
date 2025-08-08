@@ -13,6 +13,7 @@ AppUser _$AppUserFromJson(Map<String, dynamic> json) => AppUser(
   email: json['email'] as String,
   role: $enumDecode(_$UserRoleEnumMap, json['role']),
   mustChangePassword: json['mustChangePassword'] as bool,
+  imageUrl: json['profileImageUrl'] as String?,
   practitioner: json['practitioner'] == null
       ? null
       : Practitioner.fromJson(json['practitioner'] as Map<String, dynamic>),
@@ -28,6 +29,7 @@ Map<String, dynamic> _$AppUserToJson(AppUser instance) => <String, dynamic>{
   'email': instance.email,
   'role': _$UserRoleEnumMap[instance.role]!,
   'mustChangePassword': instance.mustChangePassword,
+  'profileImageUrl': instance.imageUrl,
   'practitioner': instance.practitioner,
   'patient': instance.patient,
 };

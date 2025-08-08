@@ -43,7 +43,7 @@ class PractitionerRegistrationScreen extends HookConsumerWidget {
     final isLoading = useState(false);
 
     // Watch auth state for loading and error handling
-    final authState = ref.watch(authProvider);
+    // final authState = ref.watch(authProvider);
 
     void goToNextStep() {
       if (personalInfoFormKey.currentState?.validate() == true) {
@@ -311,7 +311,7 @@ class _ClinicInfoForm extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authProvider).valueOrNull;
+    // final authState = ref.watch(authProvider).valueOrNull;
 
     return Form(
       key: formKey,

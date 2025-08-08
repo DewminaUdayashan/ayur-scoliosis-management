@@ -1,3 +1,4 @@
+import 'package:ayur_scoliosis_management/core/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -5,6 +6,7 @@ import 'core/app_router.dart';
 import 'core/theme.dart';
 
 void main() {
+  Log.initialize();
   WidgetsFlutterBinding.ensureInitialized();
   runApp(ProviderScope(child: const MyApp()));
 }
