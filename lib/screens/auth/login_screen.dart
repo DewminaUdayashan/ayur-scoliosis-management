@@ -1,4 +1,5 @@
 import 'package:ayur_scoliosis_management/core/enums.dart';
+import 'package:ayur_scoliosis_management/core/exceptions.dart';
 import 'package:ayur_scoliosis_management/core/extensions/snack.dart';
 import 'package:ayur_scoliosis_management/providers/auth/auth.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +33,7 @@ class LoginScreen extends HookConsumerWidget {
       // If already authenticated, redirect to home
       if (auth == AuthStatus.authenticated) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          context.go(AppRouter.home);
+          context.pushReplacement(AppRouter.home);
         });
       }
       return null;
@@ -123,7 +124,11 @@ class LoginScreen extends HookConsumerWidget {
                     await ref
                         .read(authProvider.notifier)
                         .signIn(emailController.text, passwordController.text);
-                  } catch (e) {
+                  } on Exception catch (e) {
+                    if (e is PasswordMustChanged && context.mounted) {
+                      context.push(AppRouter.newPassword);
+                      return;
+                    }
                     if (context.mounted) {
                       context.showError('Login failed: ${e.toString()}');
                     }

@@ -1,5 +1,15 @@
 import 'package:json_annotation/json_annotation.dart';
 
+@JsonEnum(valueField: 'code')
+enum ApiResponseCode {
+  registrationSuccess('REGISTRATION_SUCCESS'),
+  passwordChangeRequired('PASSWORD_CHANGE_REQUIRED'),
+  loginSuccess('LOGIN_SUCCESS');
+
+  const ApiResponseCode(this.code);
+  final String code;
+}
+
 enum SessionType { physical, remote }
 
 enum AppointmentType {
@@ -64,14 +74,6 @@ enum AccountStatus {
   inactive,
   @JsonValue('Suspended')
   suspended,
-}
-
-@JsonEnum(valueField: 'code')
-enum ApiResponseCode {
-  registrationSuccess('REGISTRATION_SUCCESS');
-
-  const ApiResponseCode(this.code);
-  final String code;
 }
 
 @JsonEnum(valueField: 'value')

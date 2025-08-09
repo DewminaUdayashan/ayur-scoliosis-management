@@ -1,4 +1,5 @@
 import 'package:ayur_scoliosis_management/screens/appointment_details/appointment_details_screen.dart';
+import 'package:ayur_scoliosis_management/screens/auth/new_password_screen.dart';
 import 'package:ayur_scoliosis_management/screens/auth/registration_screen.dart';
 import 'package:flutter/material.dart' show NavigatorState, GlobalKey;
 import 'package:go_router/go_router.dart';
@@ -15,6 +16,8 @@ class AppRouter {
   static const splash = '/';
 
   static const login = '/login';
+  static const newPassword = '$login/new-password';
+  static const _newPasswordPath = 'new-password';
   static const registration = '/registration';
   static const otpVerification = '/otp-verification';
 
@@ -41,6 +44,14 @@ class AppRouter {
         builder: (context, state) {
           return const LoginScreen();
         },
+        routes: [
+          GoRoute(
+            path: _newPasswordPath,
+            builder: (context, state) {
+              return const NewPasswordScreen();
+            },
+          ),
+        ],
       ),
       GoRoute(
         path: registration,

@@ -5,6 +5,8 @@ abstract class AuthService {
 
   Future<void> signUpWithEmailAndPassword(PractitionerRegisterModel data);
 
+  Future<bool> setNewPassword(String newPassword);
+
   Future<void> signOut();
 
   Future<bool> isAuthenticated();

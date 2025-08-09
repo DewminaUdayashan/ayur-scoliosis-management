@@ -16,7 +16,7 @@ class Api {
   String get signIn => '$authPath/login';
   String get forgotPassword => '$authPath/forgot-password';
   String get resetPassword => '$authPath/reset-password';
-  String get setPassword => '$authPath/set-password';
+  String get setPassword => '$authPath/patient/set-password';
   String get authStatus => '$authPath/status';
   String get signOut => '$authPath/sign-out';
 
