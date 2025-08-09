@@ -13,6 +13,12 @@ class SecureStorageService extends SecureStorageServiceBase {
   /// The key used to store the token in secure storage.
   static const tokenKey = '812f33e8-0ee2-11f0-94d3-325096b39f47';
 
+  static String? _tempToken;
+
+  static String? get tempToken => _tempToken;
+
+  static set setTempToken(String? value) => _tempToken = value;
+
   @override
   Future<void> delete(String key) => storage.delete(key: key);
 

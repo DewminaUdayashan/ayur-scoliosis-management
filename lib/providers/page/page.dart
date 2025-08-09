@@ -1,3 +1,4 @@
+import 'package:ayur_scoliosis_management/providers/profile/profile.dart';
 import 'package:ayur_scoliosis_management/screens/home/pages/patient/dashboard/patient_dashboard.dart';
 import 'package:ayur_scoliosis_management/screens/home/pages/patient/schedule/patient_schedule.dart';
 import 'package:flutter/material.dart' hide Page;
@@ -13,6 +14,7 @@ part 'page.g.dart';
 
 @riverpod
 List<Page> page(Ref ref) {
+  final user = ref.watch(profileProvider).valueOrNull;
   final practitionerPages = [
     Page(
       id: 1,
@@ -43,5 +45,6 @@ List<Page> page(Ref ref) {
     ),
     // Add other patient pages here
   ];
-  return practitionerPages;
+
+  return user?.isPractitioner == true ? practitionerPages : patientPages;
 }

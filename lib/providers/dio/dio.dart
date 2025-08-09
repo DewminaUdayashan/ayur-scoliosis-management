@@ -18,10 +18,12 @@ class TokenInterceptor extends QueuedInterceptor {
   ) async {
     try {
       options.baseUrl = Api.baseUrl;
-      final token = await SecureStorageService.instance.read<String?>(
-        SecureStorageService.tokenKey,
-        (value) => value,
-      );
+      final token =
+          SecureStorageService.tempToken ??
+          await SecureStorageService.instance.read<String?>(
+            SecureStorageService.tokenKey,
+            (value) => value,
+          );
 
       if (token != null && token.isNotEmpty) {
         options.headers['Authorization'] = 'Bearer $token';

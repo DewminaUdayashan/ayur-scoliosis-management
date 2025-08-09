@@ -15,3 +15,9 @@ class ApiException extends AppApiException {
 class EmailAlreadyRegistered extends AppApiException {
   EmailAlreadyRegistered() : super('A user with this email already exists.');
 }
+
+class PasswordMustChanged extends AppApiException {
+  final String tempToken;
+  PasswordMustChanged(this.tempToken)
+    : super('Password must be changed before proceeding.');
+}

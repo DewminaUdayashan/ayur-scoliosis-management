@@ -1,5 +1,6 @@
+import 'package:ayur_scoliosis_management/core/enums.dart';
 import 'package:ayur_scoliosis_management/core/exceptions.dart'
-    show EmailAlreadyRegistered;
+    show EmailAlreadyRegistered, PasswordMustChanged;
 import 'package:ayur_scoliosis_management/core/extensions/dio.dart';
 import 'package:ayur_scoliosis_management/models/auth/practitioner_register_model.dart';
 import 'package:ayur_scoliosis_management/services/auth/auth_service.dart';
@@ -68,6 +69,10 @@ class AuthServiceImpl extends AuthService {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
+        if (response.data['code'] ==
+            ApiResponseCode.passwordChangeRequired.code) {
+          throw PasswordMustChanged(response.data['temp_access_token']);
+        }
         return response.data['access_token'];
       } else {
         throw Exception('Failed to sign in');
@@ -91,5 +96,22 @@ class AuthServiceImpl extends AuthService {
   Future<void> signOut() {
     // TODO: implement signOut
     throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> setNewPassword(String newPassword) async {
+    try {
+      final response = await client.post(
+        api.setPassword,
+        data: {'password': newPassword},
+      );
+
+      if (response.statusCode == 201) {
+        return true;
+      }
+    } on DioException catch (e) {
+      throw e.processException();
+    }
+    return false;
   }
 }
