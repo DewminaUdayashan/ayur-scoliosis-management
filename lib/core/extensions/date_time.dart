@@ -6,4 +6,8 @@ extension DateTimeExtension on DateTime {
     final datePart = DateFormat('MMMM d, yyyy').format(this);
     return '$timePart - $datePart';
   }
+
+  String get yMMMMd => DateFormat.yMMMMd().format(this);
+
+  String get jm => DateFormat.jm().format(this);
 }

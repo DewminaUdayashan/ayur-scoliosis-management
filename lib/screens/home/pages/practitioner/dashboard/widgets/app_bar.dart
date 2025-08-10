@@ -6,6 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../../../core/extensions/theme.dart';
 import '../../../../../../core/theme.dart';
+import '../../../../../../widgets/default_app_bar.dart';
 
 class PractitionerAppBar extends HookConsumerWidget {
   const PractitionerAppBar({super.key});
@@ -53,30 +54,7 @@ class PractitionerAppBar extends HookConsumerWidget {
                 ),
               ],
             ),
-            error: (error, stack) {
-              return Row(
-                spacing: 8,
-                children: [
-                  const CircleAvatar(
-                    radius: 20,
-                    child: Icon(Icons.person, color: Colors.black),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text('SpineAlign', style: context.textTheme.bodySmall),
-                      Text(
-                        'Welcome Doctor!',
-                        style: context.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              );
-            },
+            error: (_, _) => DefaultAppBar(),
             loading: () =>
                 const CircleAvatar(radius: 20, backgroundColor: Colors.grey),
           ),

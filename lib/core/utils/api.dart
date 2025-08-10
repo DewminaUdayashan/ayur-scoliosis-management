@@ -29,9 +29,9 @@ class Api {
 
   /// Appointment endpoints
   String get appointmentsPath => '$_apiPath/appointments';
+  String appointmentDetails(String id) => '$appointmentsPath/$id';
   String get scheduleAppointment => '$appointmentsPath/schedule';
-  String get getAppointment => '$appointmentsPath/:id';
   String get checkAvailability => '$appointmentsPath/check-availability';
-  String get respondToAppointment => '$appointmentsPath/:id/respond';
+  String respondToAppointment(String id) => '$appointmentsPath/$id/respond';
   String get upcomingAppointments => '$appointmentsPath/upcoming';
 }

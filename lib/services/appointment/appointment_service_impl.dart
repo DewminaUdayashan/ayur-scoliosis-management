@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:ayur_scoliosis_management/core/extensions/dio.dart';
 import 'package:ayur_scoliosis_management/core/utils/api.dart';
 import 'package:ayur_scoliosis_management/models/appointment/appointment.dart';
@@ -6,6 +8,8 @@ import 'package:ayur_scoliosis_management/models/common/paginated/paginated.dart
 import 'package:ayur_scoliosis_management/models/common/paginated/paginated_request.dart';
 import 'package:ayur_scoliosis_management/services/appointment/appointment_service.dart';
 import 'package:dio/dio.dart';
+
+import '../../core/utils/logger.dart';
 
 class AppointmentServiceImpl extends AppointmentService {
   AppointmentServiceImpl({required this.api, required this.client});
@@ -29,6 +33,17 @@ class AppointmentServiceImpl extends AppointmentService {
         response.data,
         (json) => Appointment.fromJson(json as Map<String, dynamic>),
       );
+    } on DioException catch (e) {
+      Log.e('Error fetching appointments: ${e.message}');
+      throw e.processException();
+    }
+  }
+
+  @override
+  Future<Appointment> appointmentDetails(String id) async {
+    try {
+      final response = await client.get(api.appointmentDetails(id));
+      return Appointment.fromJson(response.data);
     } on DioException catch (e) {
       throw e.processException();
     }
@@ -57,6 +72,7 @@ class AppointmentServiceImpl extends AppointmentService {
           .map((json) => Appointment.fromJson(json))
           .toList();
     } on DioException catch (e) {
+      Log.e('Error fetching upcoming appointments: ${e.message}');
       throw e.processException();
     }
   }

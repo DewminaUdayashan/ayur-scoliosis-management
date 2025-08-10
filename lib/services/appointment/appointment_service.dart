@@ -8,6 +8,7 @@ abstract class AppointmentService {
     PaginatedRequest request,
     String? patientId,
   );
+  Future<Appointment> appointmentDetails(String id);
   Future<List<Appointment>> upcomingAppointments();
   Future<Appointment> scheduleAppointment(ScheduleAppointmentPayload payload);
 }

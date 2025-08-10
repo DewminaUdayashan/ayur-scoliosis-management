@@ -28,26 +28,22 @@ class AddAppointmentSheet extends HookWidget {
       Patient(
         profileImageUrl: 'https://i.pravatar.cc/150?img=5',
         dateOfBirth: DateTime(1998, 5, 12),
-        gender: 'Female',
-        clinicId: 'clinic_abc_123',
+        gender: Gender.female,
       ),
       Patient(
         profileImageUrl: 'https://i.pravatar.cc/150?img=12',
         dateOfBirth: DateTime(2001, 9, 23),
-        gender: 'Male',
-        clinicId: 'clinic_abc_123',
+        gender: Gender.male,
       ),
       Patient(
         profileImageUrl: 'https://i.pravatar.cc/150?img=32',
         dateOfBirth: DateTime(1995, 2, 8),
-        gender: 'Female',
-        clinicId: 'clinic_xyz_789',
+        gender: Gender.female,
       ),
       Patient(
         profileImageUrl: null, // Example with no profile image
         dateOfBirth: DateTime(2003, 11, 30),
-        gender: 'Male',
-        clinicId: 'clinic_abc_123',
+        gender: Gender.male,
       ),
     ];
 
