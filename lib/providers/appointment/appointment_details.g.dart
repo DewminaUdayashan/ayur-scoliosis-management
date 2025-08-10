@@ -7,7 +7,7 @@ part of 'appointment_details.dart';
 // **************************************************************************
 
 String _$appointmentDetailsHash() =>
-    r'5db5502b375fb3bce4752e4cb7fb20f9bf6f1f38';
+    r'e37c506e1a90300e1ccde73aa1ab87f383ef6e37';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -30,16 +30,23 @@ class _SystemHash {
   }
 }
 
-/// See also [appointmentDetails].
-@ProviderFor(appointmentDetails)
+abstract class _$AppointmentDetails
+    extends BuildlessAutoDisposeAsyncNotifier<Appointment> {
+  late final String appointmentId;
+
+  FutureOr<Appointment> build(String appointmentId);
+}
+
+/// See also [AppointmentDetails].
+@ProviderFor(AppointmentDetails)
 const appointmentDetailsProvider = AppointmentDetailsFamily();
 
-/// See also [appointmentDetails].
+/// See also [AppointmentDetails].
 class AppointmentDetailsFamily extends Family<AsyncValue<Appointment>> {
-  /// See also [appointmentDetails].
+  /// See also [AppointmentDetails].
   const AppointmentDetailsFamily();
 
-  /// See also [appointmentDetails].
+  /// See also [AppointmentDetails].
   AppointmentDetailsProvider call(String appointmentId) {
     return AppointmentDetailsProvider(appointmentId);
   }
@@ -66,14 +73,14 @@ class AppointmentDetailsFamily extends Family<AsyncValue<Appointment>> {
   String? get name => r'appointmentDetailsProvider';
 }
 
-/// See also [appointmentDetails].
+/// See also [AppointmentDetails].
 class AppointmentDetailsProvider
-    extends AutoDisposeFutureProvider<Appointment> {
-  /// See also [appointmentDetails].
+    extends
+        AutoDisposeAsyncNotifierProviderImpl<AppointmentDetails, Appointment> {
+  /// See also [AppointmentDetails].
   AppointmentDetailsProvider(String appointmentId)
     : this._internal(
-        (ref) =>
-            appointmentDetails(ref as AppointmentDetailsRef, appointmentId),
+        () => AppointmentDetails()..appointmentId = appointmentId,
         from: appointmentDetailsProvider,
         name: r'appointmentDetailsProvider',
         debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -98,13 +105,18 @@ class AppointmentDetailsProvider
   final String appointmentId;
 
   @override
-  Override overrideWith(
-    FutureOr<Appointment> Function(AppointmentDetailsRef provider) create,
+  FutureOr<Appointment> runNotifierBuild(
+    covariant AppointmentDetails notifier,
   ) {
+    return notifier.build(appointmentId);
+  }
+
+  @override
+  Override overrideWith(AppointmentDetails Function() create) {
     return ProviderOverride(
       origin: this,
       override: AppointmentDetailsProvider._internal(
-        (ref) => create(ref as AppointmentDetailsRef),
+        () => create()..appointmentId = appointmentId,
         from: from,
         name: null,
         dependencies: null,
@@ -116,7 +128,8 @@ class AppointmentDetailsProvider
   }
 
   @override
-  AutoDisposeFutureProviderElement<Appointment> createElement() {
+  AutoDisposeAsyncNotifierProviderElement<AppointmentDetails, Appointment>
+  createElement() {
     return _AppointmentDetailsProviderElement(this);
   }
 
@@ -137,13 +150,15 @@ class AppointmentDetailsProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin AppointmentDetailsRef on AutoDisposeFutureProviderRef<Appointment> {
+mixin AppointmentDetailsRef
+    on AutoDisposeAsyncNotifierProviderRef<Appointment> {
   /// The parameter `appointmentId` of this provider.
   String get appointmentId;
 }
 
 class _AppointmentDetailsProviderElement
-    extends AutoDisposeFutureProviderElement<Appointment>
+    extends
+        AutoDisposeAsyncNotifierProviderElement<AppointmentDetails, Appointment>
     with AppointmentDetailsRef {
   _AppointmentDetailsProviderElement(super.provider);
 

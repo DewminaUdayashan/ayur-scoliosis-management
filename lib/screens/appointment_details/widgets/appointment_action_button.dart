@@ -1,9 +1,11 @@
 import 'package:ayur_scoliosis_management/core/theme.dart';
+import 'package:ayur_scoliosis_management/models/appointment/appointment_respond.dart';
 import 'package:ayur_scoliosis_management/providers/profile/profile.dart';
+import 'package:ayur_scoliosis_management/widgets/app_text_field.dart';
 import 'package:ayur_scoliosis_management/widgets/buttons/primary_button.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../core/enums.dart';
@@ -24,6 +26,69 @@ class AppointmentActionButton extends HookConsumerWidget {
     final profile = ref.watch(profileProvider).valueOrNull;
     final isPatient = profile?.isPatient;
 
+    final formKey = useMemoized(() => GlobalKey<FormState>());
+
+    // Function to show change request dialog
+    Future<String?> showChangeRequestDialog() async {
+      final reasonController = TextEditingController();
+
+      return showDialog<String>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: Colors.white,
+            title: const Text('Request Appointment Change'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Please provide a reason for requesting this change and any preferred timeframe.',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+                ),
+                const SizedBox(height: 16),
+                Form(
+                  key: formKey,
+                  child: AppTextField(
+                    controller: reasonController,
+                    hintText:
+                        'e.g., I need to reschedule due to a work commitment. I\'m available next week in the afternoons.',
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please provide a reason and preferred timeframe.';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  if (formKey.currentState?.validate() ?? false) {
+                    final reason = reasonController.text.trim();
+                    context.pop(reason);
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.error,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Request Change'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
     if (profile == null) return _LoadingShimmer();
 
     return appointmentAsync.when(
@@ -38,8 +103,25 @@ class AppointmentActionButton extends HookConsumerWidget {
                     label: 'Request Change',
                     isLoading: isLoading.value,
                     backgroundColor: AppTheme.error,
-                    onPressed: () {
-                      // TODO: Implement logic to reject appointment
+                    onPressed: () async {
+                      final String? reason = await showChangeRequestDialog();
+                      if (reason != null && reason.isNotEmpty) {
+                        isLoading.value = true;
+                        await ref
+                            .read(
+                              appointmentDetailsProvider(
+                                appointment.id,
+                              ).notifier,
+                            )
+                            .respond(
+                              AppointmentRespond(
+                                id: appointment.id,
+                                accepted: false,
+                                message: reason,
+                              ),
+                            );
+                        isLoading.value = false;
+                      }
                     },
                   ),
                 ),
@@ -47,8 +129,19 @@ class AppointmentActionButton extends HookConsumerWidget {
                   child: PrimaryButton(
                     label: 'Confirm',
                     isLoading: isLoading.value,
-                    onPressed: () {
-                      // TODO: Implement logic to confirm appointment
+                    onPressed: () async {
+                      isLoading.value = true;
+                      await ref
+                          .read(
+                            appointmentDetailsProvider(appointment.id).notifier,
+                          )
+                          .respond(
+                            AppointmentRespond(
+                              id: appointment.id,
+                              accepted: true,
+                            ),
+                          );
+                      isLoading.value = false;
                     },
                   ),
                 ),
