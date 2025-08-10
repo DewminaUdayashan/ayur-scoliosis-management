@@ -13,4 +13,5 @@ abstract class AppointmentService {
   Future<List<Appointment>> upcomingAppointments();
   Future<Appointment> scheduleAppointment(ScheduleAppointmentPayload payload);
   Future<void> respondToAppointment(AppointmentRespond respond);
+  Future<List<DateTime>> getAppointmentDates(DateTime from, DateTime to);
 }

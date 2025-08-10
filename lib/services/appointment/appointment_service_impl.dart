@@ -89,4 +89,22 @@ class AppointmentServiceImpl extends AppointmentService {
       throw e.processException();
     }
   }
+
+  @override
+  Future<List<DateTime>> getAppointmentDates(DateTime from, DateTime to) async {
+    try {
+      final response = await client.get(
+        api.dates,
+        queryParameters: {
+          'start': from.toIso8601String(),
+          'end': to.toIso8601String(),
+        },
+      );
+      return List<DateTime>.from(
+        response.data.map((dateStr) => DateTime.parse(dateStr)),
+      );
+    } on DioException catch (e) {
+      throw e.processException();
+    }
+  }
 }
