@@ -1,9 +1,13 @@
+import 'package:ayur_scoliosis_management/core/extensions/date_time.dart';
 import 'package:ayur_scoliosis_management/core/extensions/theme.dart';
 import 'package:ayur_scoliosis_management/core/theme.dart';
+import 'package:ayur_scoliosis_management/core/utils/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
+
+import '../../../../../../providers/profile/profile.dart';
 
 class PatientCalendar extends HookConsumerWidget {
   const PatientCalendar({super.key, required this.onDaySelected});
@@ -11,6 +15,8 @@ class PatientCalendar extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final profile = ref.watch(profileProvider).valueOrNull;
+    final joinedDate = profile?.joinedDate;
     // --- STATE MANAGEMENT ---
     final focusedDay = useState(DateTime.now());
     final selectedDay = useState(DateTime.now());
@@ -28,7 +34,8 @@ class PatientCalendar extends HookConsumerWidget {
         ],
       ),
       child: TableCalendar(
-        firstDay: DateTime.utc(2020, 1, 1),
+        firstDay:
+            joinedDate ?? DateTime.now().subtract(Duration(days: 365 * 10)),
         lastDay: DateTime.utc(2030, 12, 31),
         focusedDay: focusedDay.value,
         calendarFormat: CalendarFormat.month,
@@ -37,6 +44,9 @@ class PatientCalendar extends HookConsumerWidget {
           selectedDay.value = newSelectedDay;
           focusedDay.value = newFocusedDay;
           onDaySelected(newSelectedDay);
+        },
+        onPageChanged: (focusedDay) {
+          Log.i('Calendar page changed to: ${focusedDay.yMMMMd}');
         },
         headerStyle: HeaderStyle(
           titleCentered: true,
