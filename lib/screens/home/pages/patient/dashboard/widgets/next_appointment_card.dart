@@ -69,7 +69,8 @@ class NextAppointmentCard extends StatelessWidget {
               ),
           ],
         ),
-        isThreeLine: true,
+        isThreeLine:
+            appointment.status == AppointmentStatus.pendingConfirmation,
         titleTextStyle: context.textTheme.titleMedium?.copyWith(
           fontWeight: FontWeight.w600,
         ),
