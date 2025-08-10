@@ -9,13 +9,13 @@ part of 'patient.dart';
 Patient _$PatientFromJson(Map<String, dynamic> json) => Patient(
   profileImageUrl: json['profileImageUrl'] as String?,
   dateOfBirth: DateTime.parse(json['dateOfBirth'] as String),
-  gender: json['gender'] as String,
-  clinicId: json['clinicId'] as String,
+  gender: $enumDecode(_$GenderEnumMap, json['gender']),
 );
 
 Map<String, dynamic> _$PatientToJson(Patient instance) => <String, dynamic>{
   'profileImageUrl': instance.profileImageUrl,
   'dateOfBirth': instance.dateOfBirth.toIso8601String(),
-  'gender': instance.gender,
-  'clinicId': instance.clinicId,
+  'gender': _$GenderEnumMap[instance.gender]!,
 };
+
+const _$GenderEnumMap = {Gender.male: 'Male', Gender.female: 'Female'};

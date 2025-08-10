@@ -15,6 +15,7 @@ class AppUser extends Equatable {
     required this.email,
     required this.role,
     required this.mustChangePassword,
+    required this.joinedDate,
     this.imageUrl,
     this.practitioner,
     this.patient,
@@ -26,6 +27,7 @@ class AppUser extends Equatable {
   final String email;
   final UserRole role;
   final bool mustChangePassword;
+  final DateTime joinedDate;
   @JsonKey(name: 'profileImageUrl')
   final String? imageUrl;
   final Practitioner? practitioner;

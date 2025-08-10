@@ -1,3 +1,6 @@
+import 'package:ayur_scoliosis_management/core/theme.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show Colors;
 import 'package:json_annotation/json_annotation.dart';
 
 @JsonEnum(valueField: 'code')
@@ -14,20 +17,30 @@ enum SessionType { physical, remote }
 
 enum AppointmentType {
   @JsonValue('Physical')
-  physical,
+  physical('Physical'),
   @JsonValue('Remote')
-  remote,
+  remote('Remote');
+
+  const AppointmentType(this.value);
+  final String value;
 }
 
 enum AppointmentStatus {
+  @JsonValue('PendingPatientConfirmation')
+  pendingConfirmation('Pending Confirmation', Colors.white, AppTheme.warning),
   @JsonValue('Scheduled')
-  scheduled,
+  scheduled('Scheduled', Colors.white, AppTheme.primary),
   @JsonValue('Completed')
-  completed,
+  completed('Completed', Colors.white, Colors.green),
   @JsonValue('Cancelled')
-  cancelled,
+  cancelled('Cancelled', Colors.white, AppTheme.error),
   @JsonValue('NoShow')
-  noShow,
+  noShow('No Show', AppTheme.textSecondary, Colors.black54);
+
+  const AppointmentStatus(this.value, this.textColor, this.backgroundColor);
+  final String value;
+  final Color textColor;
+  final Color backgroundColor;
 }
 
 enum EventType {
@@ -92,4 +105,12 @@ enum AuthStatus {
   unknown,
   passwordMustSetup,
   pendingActivation,
+}
+
+enum SortOrder {
+  ascending('asc'),
+  descending('desc');
+
+  const SortOrder(this.value);
+  final String value;
 }

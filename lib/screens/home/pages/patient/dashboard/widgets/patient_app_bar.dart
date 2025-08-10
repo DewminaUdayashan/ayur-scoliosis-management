@@ -1,51 +1,60 @@
+import 'package:ayur_scoliosis_management/providers/profile/profile.dart';
+import 'package:ayur_scoliosis_management/widgets/default_app_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../../../core/extensions/theme.dart';
 import '../../../../../../core/theme.dart';
 
-class PatientAppBar extends StatelessWidget {
+class PatientAppBar extends HookConsumerWidget {
   const PatientAppBar({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profileAsync = ref.watch(profileProvider);
     return SliverAppBar(
       backgroundColor: Colors.white,
-      title: Row(
-        children: [
-          const CircleAvatar(
-            // In a real app, this would show the patient's profile image
-            backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=5'),
-          ),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Hello,',
-                style: context.textTheme.bodyMedium?.copyWith(
+      title: profileAsync.when(
+        data: (profile) => Row(
+          children: [
+            const CircleAvatar(
+              // In a real app, this would show the patient's profile image
+              backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=5'),
+            ),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Hello,',
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    color: AppTheme.textSecondary,
+                  ),
+                ),
+                Text(
+                  profile.firstName,
+                  style: context.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const Spacer(),
+            IconButton(
+              onPressed: () {},
+              icon: Badge.count(
+                count: 3, // Example notification count
+                child: const Icon(
+                  Icons.notifications,
                   color: AppTheme.textSecondary,
                 ),
               ),
-              Text(
-                'Anusha Perera', // Replace with dynamic patient name
-                style: context.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          const Spacer(),
-          IconButton(
-            onPressed: () {},
-            icon: Badge.count(
-              count: 3, // Example notification count
-              child: const Icon(
-                Icons.notifications,
-                color: AppTheme.textSecondary,
-              ),
             ),
-          ),
-        ],
+          ],
+        ),
+        error: (_, _) => DefaultAppBar(isPatient: true),
+        loading: () =>
+            const CircleAvatar(radius: 20, backgroundColor: Colors.grey),
       ),
       floating: true,
       snap: true,

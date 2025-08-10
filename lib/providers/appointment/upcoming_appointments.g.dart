@@ -1,26 +1,30 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'profile.dart';
+part of 'upcoming_appointments.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$profileHash() => r'cefa4ac1f38d4c3f5938846e34a1ab436bb459b9';
+String _$upcomingAppointmentsHash() =>
+    r'7816f7b90642cdf8e67f47ec3d101fb9d19f61c1';
 
-/// See also [Profile].
-@ProviderFor(Profile)
-final profileProvider =
-    AutoDisposeAsyncNotifierProvider<Profile, AppUser>.internal(
-      Profile.new,
-      name: r'profileProvider',
+/// See also [upcomingAppointments].
+@ProviderFor(upcomingAppointments)
+final upcomingAppointmentsProvider =
+    AutoDisposeFutureProvider<List<Appointment>>.internal(
+      upcomingAppointments,
+      name: r'upcomingAppointmentsProvider',
       debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
           ? null
-          : _$profileHash,
+          : _$upcomingAppointmentsHash,
       dependencies: null,
       allTransitiveDependencies: null,
     );
 
-typedef _$Profile = AutoDisposeAsyncNotifier<AppUser>;
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef UpcomingAppointmentsRef =
+    AutoDisposeFutureProviderRef<List<Appointment>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -1,4 +1,7 @@
 import 'package:ayur_scoliosis_management/core/app_router.dart';
+import 'package:ayur_scoliosis_management/core/enums.dart';
+import 'package:ayur_scoliosis_management/core/extensions/date_time.dart';
+import 'package:ayur_scoliosis_management/models/appointment/appointment.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -8,11 +11,19 @@ import '../../../../../../core/extensions/theme.dart';
 import '../../../../../../core/theme.dart';
 
 class NextAppointmentCard extends StatelessWidget {
-  const NextAppointmentCard({super.key, this.isRemote = false});
-  final bool isRemote;
+  const NextAppointmentCard({
+    super.key,
+    required this.appointment,
+    this.onAccept,
+  });
+
+  final Appointment appointment;
+  final VoidCallback? onAccept;
 
   @override
   Widget build(BuildContext context) {
+    final isRemote = appointment.type == AppointmentType.remote;
+
     return Card(
       surfaceTintColor: Colors.transparent,
       shape: RoundedRectangleBorder(borderRadius: radius8),
@@ -32,33 +43,38 @@ class NextAppointmentCard extends StatelessWidget {
         ),
         title: Text(
           isRemote
-              ? 'Video Call with Dr. John Doe'
-              : 'In-Person Appointment with Dr. John Doe',
+              ? 'Video Call with Dr. ${appointment.practitioner?.firstName}'
+              : 'In-Person Appointment with Dr. ${appointment.practitioner?.firstName}',
           style: context.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w600,
           ),
         ),
-        subtitle: Text(
-          isRemote ? '11:00 AM - July 20, 2025' : '10:00 AM - July 28, 2025',
-          style: context.textTheme.bodyMedium?.copyWith(
-            color: AppTheme.textSecondary,
-          ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '${appointment.appointmentDateTime.readableTimeAndDate} • ${appointment.durationInMinutes} min',
+              style: context.textTheme.bodyMedium?.copyWith(
+                color: AppTheme.textSecondary,
+              ),
+            ),
+            if (appointment.status == AppointmentStatus.pendingConfirmation)
+              Text(
+                appointment.status.value,
+                style: context.textTheme.bodyMedium?.copyWith(
+                  color: appointment.status == AppointmentStatus.scheduled
+                      ? Colors.green
+                      : Colors.amber.shade900,
+                ),
+              ),
+          ],
         ),
-        trailing: const Icon(
-          CupertinoIcons.chevron_forward,
-          color: AppTheme.textSecondary,
-        ),
+        isThreeLine:
+            appointment.status == AppointmentStatus.pendingConfirmation,
         titleTextStyle: context.textTheme.titleMedium?.copyWith(
           fontWeight: FontWeight.w600,
         ),
-        onTap: () {
-          context.push(
-            AppRouter.appointmentDetails,
-            extra: {
-              'id': '12345', // Example appointment ID
-            },
-          );
-        },
+        onTap: () => context.push(AppRouter.appointmentDetails(appointment.id)),
       ),
     );
   }
