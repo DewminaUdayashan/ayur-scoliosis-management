@@ -12,10 +12,12 @@ class PrimaryButton extends StatefulWidget {
     this.onPressed,
     required this.isLoading,
     required this.label,
+    this.backgroundColor,
   });
   final VoidCallback? onPressed;
   final bool isLoading;
   final String label;
+  final Color? backgroundColor;
 
   @override
   State<PrimaryButton> createState() => _PrimaryButtonState();
@@ -47,6 +49,7 @@ class _PrimaryButtonState extends State<PrimaryButton>
         FilledButton(
           onPressed: widget.isLoading ? null : widget.onPressed,
           style: ElevatedButton.styleFrom(
+            backgroundColor: widget.backgroundColor,
             padding: const EdgeInsets.all(10),
             minimumSize: const Size(double.infinity, 48),
             shape: RoundedRectangleBorder(borderRadius: radiusFull),
@@ -68,6 +71,7 @@ class _PrimaryButtonState extends State<PrimaryButton>
                 painter: LoadingBorderPainter(
                   animation: _controller,
                   borderRadius: radiusFull,
+                  color: widget.backgroundColor,
                 ),
               ),
             ),
@@ -78,11 +82,14 @@ class _PrimaryButtonState extends State<PrimaryButton>
 }
 
 class LoadingBorderPainter extends CustomPainter {
+  LoadingBorderPainter({
+    required this.animation,
+    required this.borderRadius,
+    this.color,
+  }) : super(repaint: animation);
   final Animation<double> animation;
   final BorderRadius borderRadius;
-
-  LoadingBorderPainter({required this.animation, required this.borderRadius})
-    : super(repaint: animation);
+  final Color? color;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -90,7 +97,7 @@ class LoadingBorderPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth =
           2.5 // The thickness of the loading line
-      ..color = AppTheme.primary; // The color of the loading line
+      ..color = color ?? AppTheme.primary; // The color of the loading line
 
     // Create the shader for the gradient effect
     paint.shader = SweepGradient(
@@ -98,7 +105,7 @@ class LoadingBorderPainter extends CustomPainter {
       startAngle: 0.0,
       endAngle: 2 * pi,
       // Define the colors for the "line". It fades from transparent to the main color.
-      colors: const [Colors.transparent, AppTheme.primary],
+      colors: [Colors.transparent, color ?? AppTheme.primary],
       // Stops define where the colors are placed. This creates a line that is 1/4 of the circumference.
       stops: const [0.75, 1.0],
       // The transform rotates the gradient based on the animation controller's value

@@ -1,3 +1,4 @@
+import 'package:ayur_scoliosis_management/core/theme.dart';
 import 'package:ayur_scoliosis_management/providers/profile/profile.dart';
 import 'package:ayur_scoliosis_management/widgets/buttons/primary_button.dart';
 import 'package:flutter/cupertino.dart';
@@ -29,12 +30,29 @@ class AppointmentActionButton extends HookConsumerWidget {
       data: (appointment) {
         if (isPatient == true) {
           if (appointment.status == AppointmentStatus.pendingConfirmation) {
-            return PrimaryButton(
-              label: 'Confirm Appointment',
-              isLoading: isLoading.value,
-              onPressed: () {
-                // TODO: Implement logic to confirm appointment
-              },
+            return Row(
+              spacing: 16,
+              children: [
+                Expanded(
+                  child: PrimaryButton(
+                    label: 'Request Change',
+                    isLoading: isLoading.value,
+                    backgroundColor: AppTheme.error,
+                    onPressed: () {
+                      // TODO: Implement logic to reject appointment
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: PrimaryButton(
+                    label: 'Confirm',
+                    isLoading: isLoading.value,
+                    onPressed: () {
+                      // TODO: Implement logic to confirm appointment
+                    },
+                  ),
+                ),
+              ],
             );
           }
           return SizedBox.shrink();
