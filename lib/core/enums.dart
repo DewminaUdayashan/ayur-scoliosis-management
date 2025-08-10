@@ -20,14 +20,19 @@ enum AppointmentType {
 }
 
 enum AppointmentStatus {
+  @JsonValue('PendingPatientConfirmation')
+  pendingConfirmation('Pending Confirmation'),
   @JsonValue('Scheduled')
-  scheduled,
+  scheduled('Scheduled'),
   @JsonValue('Completed')
-  completed,
+  completed('Completed'),
   @JsonValue('Cancelled')
-  cancelled,
+  cancelled('Cancelled'),
   @JsonValue('NoShow')
-  noShow,
+  noShow('No Show');
+
+  const AppointmentStatus(this.value);
+  final String value;
 }
 
 enum EventType {
@@ -92,4 +97,12 @@ enum AuthStatus {
   unknown,
   passwordMustSetup,
   pendingActivation,
+}
+
+enum SortOrder {
+  ascending('asc'),
+  descending('desc');
+
+  const SortOrder(this.value);
+  final String value;
 }

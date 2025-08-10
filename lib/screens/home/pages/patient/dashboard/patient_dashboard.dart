@@ -1,4 +1,4 @@
-import 'package:ayur_scoliosis_management/screens/home/pages/patient/dashboard/widgets/next_appointment_card.dart';
+import 'package:ayur_scoliosis_management/screens/home/pages/patient/dashboard/widgets/next_appointment.dart';
 import 'package:ayur_scoliosis_management/screens/home/pages/patient/dashboard/widgets/recent_instruction_card.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -20,8 +20,7 @@ class PatientDashboard extends HookConsumerWidget {
           PatientAppBar(),
           SliverSizedBox(height: 20),
           PageTitle(title: 'Your Next Appointment'),
-          NextAppointmentCard(isRemote: true).sliverToBoxAdapter,
-          NextAppointmentCard().sliverToBoxAdapter,
+          NextAppointment().sliverToBoxAdapter,
           SliverSizedBox(height: 20),
           PageTitle(title: 'Recent Instructions'),
           RecentInstructionCard().sliverToBoxAdapter,

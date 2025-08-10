@@ -1,5 +1,5 @@
 import 'package:ayur_scoliosis_management/core/enums.dart';
-import 'package:ayur_scoliosis_management/models/appiontment/appointment.dart';
+import 'package:ayur_scoliosis_management/models/appointment/appointment.dart';
 import 'package:ayur_scoliosis_management/widgets/patient_profile_avatar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

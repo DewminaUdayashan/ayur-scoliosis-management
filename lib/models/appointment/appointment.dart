@@ -1,5 +1,6 @@
 import 'package:ayur_scoliosis_management/core/enums.dart'
     show AppointmentType, AppointmentStatus;
+import 'package:ayur_scoliosis_management/models/common/user_name.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -7,15 +8,6 @@ part 'appointment.g.dart';
 
 @JsonSerializable()
 class Appointment extends Equatable {
-  final String id;
-  final String patientId;
-  final String practitionerId;
-  final DateTime appointmentDateTime;
-  final int durationInMinutes;
-  final AppointmentType type;
-  final AppointmentStatus status;
-  final String notes;
-
   const Appointment({
     required this.id,
     required this.patientId,
@@ -25,7 +17,21 @@ class Appointment extends Equatable {
     required this.type,
     required this.status,
     required this.notes,
+    this.practitioner,
+    this.patient,
   });
+  final String id;
+  final String patientId;
+  final String practitionerId;
+  final DateTime appointmentDateTime;
+  final int durationInMinutes;
+  final AppointmentType type;
+  final AppointmentStatus status;
+  final String notes;
+  @JsonKey(includeToJson: false)
+  final UserName? practitioner;
+  @JsonKey(includeToJson: false)
+  final UserName? patient;
 
   factory Appointment.fromJson(Map<String, dynamic> json) =>
       _$AppointmentFromJson(json);

@@ -15,6 +15,12 @@ Appointment _$AppointmentFromJson(Map<String, dynamic> json) => Appointment(
   type: $enumDecode(_$AppointmentTypeEnumMap, json['type']),
   status: $enumDecode(_$AppointmentStatusEnumMap, json['status']),
   notes: json['notes'] as String,
+  practitioner: json['practitioner'] == null
+      ? null
+      : UserName.fromJson(json['practitioner'] as Map<String, dynamic>),
+  patient: json['patient'] == null
+      ? null
+      : UserName.fromJson(json['patient'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$AppointmentToJson(Appointment instance) =>
@@ -35,6 +41,7 @@ const _$AppointmentTypeEnumMap = {
 };
 
 const _$AppointmentStatusEnumMap = {
+  AppointmentStatus.pendingConfirmation: 'PendingPatientConfirmation',
   AppointmentStatus.scheduled: 'Scheduled',
   AppointmentStatus.completed: 'Completed',
   AppointmentStatus.cancelled: 'Cancelled',

@@ -26,8 +26,9 @@ class AppRouter {
   static const patientDetails = '$home/patients/patient-details';
   static const _patientDetailsPath = 'patients/patient-details';
 
-  static const appointmentDetails = '$home/appointment-details';
-  static const _appointmentDetailsPath = 'appointment-details';
+  static String appointmentDetails(String id) =>
+      '$home/appointment-details/$id';
+  static const _appointmentDetailsPath = 'appointment-details/:id';
 
   static final routes = GoRouter(
     initialLocation: login,
@@ -81,7 +82,7 @@ class AppRouter {
           GoRoute(
             path: _appointmentDetailsPath,
             builder: (context, state) {
-              final id = (state.extra as Map?)?['id'];
+              final id = state.pathParameters['id']!;
               return AppointmentDetailsScreen(appointmentId: id);
             },
           ),
