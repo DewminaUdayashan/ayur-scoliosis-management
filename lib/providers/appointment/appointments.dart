@@ -13,9 +13,16 @@ class Appointments extends _$Appointments {
   final int _pageSize = 10;
   String _sortBy = 'appointmentDateTime';
   SortOrder _sortOrder = SortOrder.ascending;
+  DateTime? _startDate;
+  DateTime? _endDate;
 
   @override
-  Future<List<Paginated<Appointment>>> build() async {
+  Future<List<Paginated<Appointment>>> build({
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    _startDate = startDate;
+    _endDate = endDate;
     final service = ref.watch(appointmentServiceProvider);
     final appointments = await service.getAppointments(
       PaginatedRequest(
@@ -23,6 +30,8 @@ class Appointments extends _$Appointments {
         pageSize: _pageSize,
         sortBy: _sortBy,
         sortOrder: _sortOrder,
+        startDate: _startDate,
+        endDate: _endDate,
       ),
       null,
     );

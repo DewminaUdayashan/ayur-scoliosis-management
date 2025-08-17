@@ -6,29 +6,25 @@ import '../../core/constants/size.dart';
 import '../../core/extensions/theme.dart';
 import '../../core/theme.dart';
 
-class PrimaryButton extends StatefulWidget {
-  const PrimaryButton({
+class OutlinedAppButton extends StatefulWidget {
+  const OutlinedAppButton({
     super.key,
     this.onPressed,
     required this.isLoading,
     required this.label,
-    this.backgroundColor,
-    this.textStyle,
-    this.height,
+    this.borderColor,
   });
 
   final VoidCallback? onPressed;
   final bool isLoading;
   final String label;
-  final Color? backgroundColor;
-  final TextStyle? textStyle;
-  final double? height;
+  final Color? borderColor;
 
   @override
-  State<PrimaryButton> createState() => _PrimaryButtonState();
+  State<OutlinedAppButton> createState() => _OutlinedAppButtonState();
 }
 
-class _PrimaryButtonState extends State<PrimaryButton>
+class _OutlinedAppButtonState extends State<OutlinedAppButton>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 
@@ -49,30 +45,23 @@ class _PrimaryButtonState extends State<PrimaryButton>
 
   @override
   Widget build(BuildContext context) {
-    final double buttonHeight = widget.height ?? 48;
+    final Color effectiveBorderColor = widget.borderColor ?? AppTheme.primary;
 
     return Stack(
       children: [
-        FilledButton(
+        OutlinedButton(
           onPressed: widget.isLoading ? null : widget.onPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: widget.backgroundColor,
+          style: OutlinedButton.styleFrom(
             padding: const EdgeInsets.all(10),
-            minimumSize: Size(double.infinity, buttonHeight),
+            minimumSize: const Size(double.infinity, 48),
             shape: RoundedRectangleBorder(borderRadius: radiusFull),
+            side: BorderSide(color: effectiveBorderColor, width: 2),
           ),
           child: Text(
             widget.label,
-            style:
-                (widget.textStyle ??
-                        context.textTheme.titleMedium?.copyWith(
-                          color: Colors.white,
-                        ))
-                    ?.copyWith(
-                      color: widget.isLoading
-                          ? Colors.grey
-                          : (widget.textStyle?.color ?? Colors.white),
-                    ),
+            style: context.textTheme.titleMedium?.copyWith(
+              color: widget.isLoading ? Colors.grey : effectiveBorderColor,
+            ),
           ),
         ),
         if (widget.isLoading)
@@ -82,7 +71,7 @@ class _PrimaryButtonState extends State<PrimaryButton>
                 painter: LoadingBorderPainter(
                   animation: _controller,
                   borderRadius: radiusFull,
-                  color: widget.backgroundColor,
+                  color: effectiveBorderColor,
                 ),
               ),
             ),
@@ -92,6 +81,7 @@ class _PrimaryButtonState extends State<PrimaryButton>
   }
 }
 
+/// Reuse the same LoadingBorderPainter from PrimaryButton
 class LoadingBorderPainter extends CustomPainter {
   LoadingBorderPainter({
     required this.animation,

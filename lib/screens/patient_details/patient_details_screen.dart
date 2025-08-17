@@ -16,7 +16,7 @@ import 'widgets/patient_timeline_tab.dart';
 
 class PatientDetailsScreen extends HookConsumerWidget {
   const PatientDetailsScreen({super.key, required this.patientId});
-  final int patientId;
+  final String patientId;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tabController = useTabController(initialLength: 3);

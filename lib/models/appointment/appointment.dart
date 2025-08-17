@@ -37,6 +37,43 @@ class Appointment extends Equatable {
       _$AppointmentFromJson(json);
   Map<String, dynamic> toJson() => _$AppointmentToJson(this);
 
+  /// Returns a human-readable string representing time until appointment.
+  String get timeUntilAppointment {
+    final now = DateTime.now();
+    final appointmentDateTime = this.appointmentDateTime.toLocal();
+    if (appointmentDateTime.isBefore(now)) {
+      return "Appointment time has passed";
+    }
+
+    final diff = appointmentDateTime.difference(now);
+    final totalDays = diff.inDays;
+    final totalHours = diff.inHours;
+    final totalMinutes = diff.inMinutes;
+    print('Now: $now');
+    print('Appointment: $appointmentDateTime');
+    if (totalDays >= 30) {
+      final months = totalDays ~/ 30;
+      final weeks = (totalDays % 30) ~/ 7;
+      return "$months month${months > 1 ? 's' : ''}"
+          "${weeks > 0 ? ' and $weeks week${weeks > 1 ? 's' : ''}' : ''}";
+    } else if (totalDays >= 7) {
+      final weeks = totalDays ~/ 7;
+      final days = totalDays % 7;
+      return "$weeks week${weeks > 1 ? 's' : ''}"
+          "${days > 0 ? ' and $days day${days > 1 ? 's' : ''}' : ''}";
+    } else if (totalDays > 0) {
+      final hours = diff.inHours % 24;
+      return "$totalDays day${totalDays > 1 ? 's' : ''}"
+          "${hours > 0 ? ' and $hours hour${hours > 1 ? 's' : ''}' : ''}";
+    } else if (totalHours > 0) {
+      final minutes = totalMinutes % 60;
+      return "$totalHours hour${totalHours > 1 ? 's' : ''}"
+          "${minutes > 0 ? ' and $minutes minute${minutes > 1 ? 's' : ''}' : ''}";
+    } else {
+      return "$totalMinutes minute${totalMinutes != 1 ? 's' : ''}";
+    }
+  }
+
   @override
   List<Object?> get props => [id];
 }
