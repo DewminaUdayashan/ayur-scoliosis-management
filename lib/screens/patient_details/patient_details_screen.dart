@@ -1,3 +1,6 @@
+import 'package:ayur_scoliosis_management/core/extensions/date_time.dart';
+import 'package:ayur_scoliosis_management/providers/patient/patient_details.dart';
+import 'package:ayur_scoliosis_management/screens/patient_details/widgets/patient_profile_name.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -22,6 +25,8 @@ class PatientDetailsScreen extends HookConsumerWidget {
     final tabController = useTabController(initialLength: 3);
     final activeTab = useState(0);
 
+    final patientAsync = ref.watch(patientDetailsProvider(patientId));
+
     useEffect(() {
       void listener() {
         if (tabController.indexIsChanging) {
@@ -45,48 +50,42 @@ class PatientDetailsScreen extends HookConsumerWidget {
               onPressed: () => context.pop(),
             ),
             // This title will appear automatically when the app bar collapses.
-            title: Text(
-              'John Doe',
-              style: context.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-            ),
+            title: PatientProfileName(id: patientId),
             centerTitle: true,
             pinned: true, // Keeps the app bar and TabBar visible
             floating: true,
             snap: true,
             // The flexibleSpace should only contain the background content.
-            flexibleSpace: FlexibleSpaceBar(
-              title: Text(
-                'John Doe',
-                style: context.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
+            flexibleSpace: patientAsync.when(
+              data: (patient) => FlexibleSpaceBar(
+                title: PatientProfileName(id: patientId),
+                titlePadding: const EdgeInsets.only(bottom: 50),
+                background: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    const PatientProfileAvatar(size: 70),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Joined : ${patient.joinedDate.yMMMMd}',
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
+                    if (patient.lastAppointmentDate != null)
+                      Text(
+                        'Last Visit: ${patient.lastAppointmentDate!.readableTimeAndDate}',
+                        style: context.textTheme.bodySmall?.copyWith(
+                          color: AppTheme.textSecondary,
+                        ),
+                      ),
+
+                    // Add padding at the bottom to create space above the TabBar.
+                    const SizedBox(height: 90),
+                  ],
                 ),
               ),
-              titlePadding: const EdgeInsets.only(bottom: 50),
-              background: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  const PatientProfileAvatar(size: 70),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Id # $patientId',
-                    style: context.textTheme.bodyMedium?.copyWith(
-                      color: AppTheme.textSecondary,
-                    ),
-                  ),
-                  Text(
-                    'Last Visit: 2023-10-01',
-                    style: context.textTheme.bodySmall?.copyWith(
-                      color: AppTheme.textSecondary,
-                    ),
-                  ),
-                  // Add padding at the bottom to create space above the TabBar.
-                  const SizedBox(height: 90),
-                ],
-              ),
+              error: (error, _) => FlexibleSpaceBar(),
+              loading: () => FlexibleSpaceBar(),
             ),
 
             bottom: TabBar(
@@ -101,7 +100,8 @@ class PatientDetailsScreen extends HookConsumerWidget {
               ],
             ),
           ),
-          if (activeTab.value == 0) PatientProfileTab().sliverToBoxAdapter,
+          if (activeTab.value == 0)
+            PatientProfileTab(id: patientId).sliverToBoxAdapter,
           if (activeTab.value == 1) ...[
             SliverSizedBox(height: 20),
             PatientTimelineTab(),

@@ -1,84 +1,113 @@
+import 'package:ayur_scoliosis_management/core/extensions/date_time.dart';
+import 'package:ayur_scoliosis_management/widgets/skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../core/extensions/theme.dart';
+import '../../../providers/patient/patient_details.dart';
 
 class PatientProfileTab extends HookConsumerWidget {
-  const PatientProfileTab({super.key});
+  const PatientProfileTab({super.key, required this.id});
+  final String id;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final patientAsync = ref.watch(patientDetailsProvider(id));
     // The main content is wrapped in a SingleChildScrollView
     // to ensure it can scroll on smaller devices if the content overflows.
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          // First Card: Personal Information
-          _InfoCard(
-            title: 'Personal Information',
+      child: patientAsync.when(
+        data: (user) {
+          final patient = user.patient;
+          return Column(
             children: [
-              _InfoRow(label: 'Date of Birth', value: '1995-05-20'),
-              _InfoRow(label: 'Gender', value: 'Female'),
-              _InfoRow(
-                label: 'Diagnosis',
-                value: 'Adolescent Idiopathic Scoliosis',
+              // First Card: Personal Information
+              _InfoCard(
+                title: 'Personal Information',
+                children: [
+                  _InfoRow(
+                    label: 'Date of Birth',
+                    value: patient?.dateOfBirth.yMMMMd,
+                  ),
+                  _InfoRow(label: 'Gender', value: patient?.gender.value),
+
+                  ///TODO: Develop a way to display the diagnosis, severity
+                  _InfoRow(label: 'Diagnosis', value: '-'),
+                  // _InfoRow(
+                  //   label: 'Severity',
+                  //   // A custom widget is used for the value to create the chip
+                  //   valueWidget: Chip(
+                  //     label: Text(
+                  //       'Moderate',
+                  //       style: TextStyle(
+                  //         color: Colors.amber.shade900,
+                  //         fontWeight: FontWeight.w500,
+                  //       ),
+                  //     ),
+                  //     backgroundColor: Colors.amber.shade100,
+                  //     shape: RoundedRectangleBorder(
+                  //       borderRadius: BorderRadius.circular(20),
+                  //       side: BorderSide.none,
+                  //     ),
+                  //     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  //     padding: const EdgeInsets.symmetric(
+                  //       horizontal: 12,
+                  //       vertical: 4,
+                  //     ),
+                  //   ),
+                  // ),
+                ],
               ),
-              _InfoRow(
-                label: 'Severity',
-                // A custom widget is used for the value to create the chip
-                valueWidget: Chip(
-                  label: Text(
-                    'Moderate',
-                    style: TextStyle(
-                      color: Colors.amber.shade900,
-                      fontWeight: FontWeight.w500,
+
+              const SizedBox(height: 24), // Space between the two cards
+              // Second Card: Contact Information
+              _InfoCard(
+                title: 'Contact Information',
+                children: [
+                  _InfoRow(
+                    label: 'Phone',
+                    valueWidget: Text(
+                      user.phone ?? '-',
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        color: Colors.blue,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
-                  backgroundColor: Colors.amber.shade100,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    side: BorderSide.none,
+                  _InfoRow(
+                    label: 'Email',
+                    valueWidget: Text(
+                      user.email,
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        color: Colors.blue,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ),
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 4,
-                  ),
-                ),
+                  // _InfoRow(
+                  //   label: 'Address',
+                  //   value: patient.address,
+                  // ),
+                ],
               ),
             ],
-          ),
-
-          const SizedBox(height: 24), // Space between the two cards
-          // Second Card: Contact Information
-          _InfoCard(
-            title: 'Contact Information',
-            children: [
-              _InfoRow(
-                label: 'Phone',
-                valueWidget: Text(
-                  '(555) 123-4567',
-                  style: context.textTheme.bodyMedium?.copyWith(
-                    color: Colors.blue,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              _InfoRow(
-                label: 'Email',
-                valueWidget: Text(
-                  'sophia.carter@email.com',
-                  style: context.textTheme.bodyMedium?.copyWith(
-                    color: Colors.blue,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              _InfoRow(label: 'Address', value: '123 Main St, Anytown, USA'),
-            ],
-          ),
-        ],
+          );
+        },
+        error: (error, _) => Center(child: Text('Error: $error')),
+        loading: () => Column(
+          spacing: 20,
+          children: [
+            Skeleton(
+              builder: (decoration) =>
+                  Container(height: 150, decoration: decoration),
+            ),
+            Skeleton(
+              builder: (decoration) =>
+                  Container(height: 150, decoration: decoration),
+            ),
+          ],
+        ),
       ),
     );
   }

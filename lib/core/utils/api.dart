@@ -23,6 +23,7 @@ class Api {
   /// Patient endpoints
   String get patientPath => '$_apiPath/patient';
   String get invitePatient => '$patientPath/invite';
+  String patientDetails(String id) => '$patientPath/$id';
 
   /// Profile endpoints
   String get profilePath => '$_apiPath/profile';

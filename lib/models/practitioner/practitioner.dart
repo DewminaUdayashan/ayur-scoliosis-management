@@ -7,14 +7,12 @@ part 'practitioner.g.dart';
 @JsonSerializable()
 class Practitioner {
   const Practitioner({
-    required this.phone,
     required this.specialty,
     required this.medicalLicense,
     required this.status,
     required this.clinicId,
     this.clinic,
   });
-  final String phone;
   final String specialty;
   final String medicalLicense;
   final AccountStatus status;
