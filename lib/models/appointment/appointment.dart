@@ -10,6 +10,7 @@ part 'appointment.g.dart';
 class Appointment extends Equatable {
   const Appointment({
     required this.id,
+    required this.name,
     required this.patientId,
     required this.practitionerId,
     required this.appointmentDateTime,
@@ -21,6 +22,7 @@ class Appointment extends Equatable {
     this.patient,
   });
   final String id;
+  final String name;
   final String patientId;
   final String practitionerId;
   final DateTime appointmentDateTime;
@@ -49,8 +51,6 @@ class Appointment extends Equatable {
     final totalDays = diff.inDays;
     final totalHours = diff.inHours;
     final totalMinutes = diff.inMinutes;
-    print('Now: $now');
-    print('Appointment: $appointmentDateTime');
     if (totalDays >= 30) {
       final months = totalDays ~/ 30;
       final weeks = (totalDays % 30) ~/ 7;
