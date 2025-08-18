@@ -18,7 +18,7 @@ class AppointmentCard extends StatelessWidget {
       child: ListTile(
         tileColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: radius8),
-        leading: PatientProfileAvatar(),
+        leading: PatientProfileAvatar(url: null),
         title: Text('Patient Name'),
         subtitle: Row(
           spacing: 4,

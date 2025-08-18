@@ -63,7 +63,7 @@ class PatientDetailsScreen extends HookConsumerWidget {
                 background: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    const PatientProfileAvatar(size: 70),
+                    PatientProfileAvatar(size: 70, url: patient.imageUrl),
                     const SizedBox(height: 8),
                     Text(
                       'Joined : ${patient.joinedDate.yMMMMd}',

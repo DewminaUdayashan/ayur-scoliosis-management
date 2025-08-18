@@ -47,7 +47,7 @@ class PractitionerPatients extends HookConsumerWidget {
                   itemCount: 40,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      leading: PatientProfileAvatar(),
+                      leading: PatientProfileAvatar(url: null),
                       title: Text('Patient 1'),
                       subtitle: Text('Condition: Scoliosis'),
                       trailing: Text('Last Visit: 2023-10-01'),

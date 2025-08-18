@@ -7,7 +7,10 @@ import '../../models/auth/app_user.dart';
 part 'patient_details.g.dart';
 
 @riverpod
-Future<AppUser> patientDetails(Ref ref, String patientId) {
+Future<AppUser> patientDetails(Ref ref, String? patientId) {
   final service = ref.watch(patientServiceProvider);
+  if (patientId == null) {
+    throw Exception('Patient ID is null');
+  }
   return service.getPatientDetails(patientId);
 }

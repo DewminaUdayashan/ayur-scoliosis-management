@@ -6,7 +6,7 @@ part of 'patient_details.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$patientDetailsHash() => r'db176a574914ecaa10d130d30dafc65ec2eb193f';
+String _$patientDetailsHash() => r'f8ffc24ff2cb3283f077c63edc062c248b79963f';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -39,7 +39,7 @@ class PatientDetailsFamily extends Family<AsyncValue<AppUser>> {
   const PatientDetailsFamily();
 
   /// See also [patientDetails].
-  PatientDetailsProvider call(String patientId) {
+  PatientDetailsProvider call(String? patientId) {
     return PatientDetailsProvider(patientId);
   }
 
@@ -68,7 +68,7 @@ class PatientDetailsFamily extends Family<AsyncValue<AppUser>> {
 /// See also [patientDetails].
 class PatientDetailsProvider extends AutoDisposeFutureProvider<AppUser> {
   /// See also [patientDetails].
-  PatientDetailsProvider(String patientId)
+  PatientDetailsProvider(String? patientId)
     : this._internal(
         (ref) => patientDetails(ref as PatientDetailsRef, patientId),
         from: patientDetailsProvider,
@@ -92,7 +92,7 @@ class PatientDetailsProvider extends AutoDisposeFutureProvider<AppUser> {
     required this.patientId,
   }) : super.internal();
 
-  final String patientId;
+  final String? patientId;
 
   @override
   Override overrideWith(
@@ -135,7 +135,7 @@ class PatientDetailsProvider extends AutoDisposeFutureProvider<AppUser> {
 // ignore: unused_element
 mixin PatientDetailsRef on AutoDisposeFutureProviderRef<AppUser> {
   /// The parameter `patientId` of this provider.
-  String get patientId;
+  String? get patientId;
 }
 
 class _PatientDetailsProviderElement
@@ -144,7 +144,7 @@ class _PatientDetailsProviderElement
   _PatientDetailsProviderElement(super.provider);
 
   @override
-  String get patientId => (origin as PatientDetailsProvider).patientId;
+  String? get patientId => (origin as PatientDetailsProvider).patientId;
 }
 
 // ignore_for_file: type=lint
