@@ -1,4 +1,5 @@
 import 'package:ayur_scoliosis_management/core/extensions/date_time.dart';
+import 'package:ayur_scoliosis_management/providers/auth/auth.dart';
 import 'package:ayur_scoliosis_management/providers/patient/patient_details.dart';
 import 'package:ayur_scoliosis_management/screens/patient_details/widgets/patient_profile_name.dart';
 import 'package:flutter/cupertino.dart';
@@ -24,8 +25,8 @@ class PatientDetailsScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tabController = useTabController(initialLength: 3);
     final activeTab = useState(0);
-
     final patientAsync = ref.watch(patientDetailsProvider(patientId));
+    final patient = patientAsync.valueOrNull;
 
     useEffect(() {
       void listener() {
@@ -49,6 +50,16 @@ class PatientDetailsScreen extends HookConsumerWidget {
               icon: const Icon(CupertinoIcons.back),
               onPressed: () => context.pop(),
             ),
+            actions: [
+              if (patient?.isPatient == true)
+                IconButton(
+                  icon: const Icon(Icons.logout_outlined),
+                  tooltip: 'Logout',
+                  onPressed: () {
+                    ref.read(authProvider.notifier).signOut();
+                  },
+                ),
+            ],
             // This title will appear automatically when the app bar collapses.
             title: PatientProfileName(id: patientId),
             centerTitle: true,

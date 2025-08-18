@@ -1,9 +1,11 @@
+import 'package:ayur_scoliosis_management/core/app_router.dart';
 import 'package:ayur_scoliosis_management/core/enums.dart';
 import 'package:ayur_scoliosis_management/core/exceptions.dart';
 import 'package:ayur_scoliosis_management/models/auth/practitioner_register_model.dart';
 import 'package:ayur_scoliosis_management/providers/auth/auth_service.dart';
 import 'package:ayur_scoliosis_management/providers/dio/dio.dart';
 import 'package:ayur_scoliosis_management/services/storage/secure_storage_service_impl.dart';
+import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth.g.dart';
@@ -48,10 +50,13 @@ class Auth extends _$Auth {
   }
 
   Future<void> signOut() async {
-    final service = ref.watch(authServiceProvider);
-    await service.signOut();
-    SecureStorageService.setTempToken = null;
+    // final service = ref.watch(authServiceProvider);
+    // await service.signOut();
     state = AsyncValue.data(AuthStatus.unauthenticated);
+    SecureStorageService.setTempToken = null;
+    SecureStorageService.instance.deleteAll();
+    ref.invalidate(dioProvider);
+    navigatorKey.currentContext?.pushReplacement(AppRouter.login);
   }
 
   Future<void> setNewPassword(String newPassword) async {
