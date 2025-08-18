@@ -42,9 +42,7 @@ class NextAppointmentCard extends StatelessWidget {
           ),
         ),
         title: Text(
-          isRemote
-              ? 'Video Call with Dr. ${appointment.practitioner?.firstName}'
-              : 'In-Person Appointment with Dr. ${appointment.practitioner?.firstName}',
+          '${appointment.name} with Dr. ${appointment.practitioner?.firstName}',
           style: context.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w600,
           ),

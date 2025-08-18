@@ -23,7 +23,7 @@ class NotesCardWidget extends HookConsumerWidget {
         title: 'Notes',
         children: [
           Text(
-            appointment.notes,
+            appointment.notes ?? '-',
             style: context.textTheme.bodyMedium?.copyWith(
               color: AppTheme.textSecondary,
               height: 1.5,

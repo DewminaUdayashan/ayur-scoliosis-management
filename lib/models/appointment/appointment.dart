@@ -17,7 +17,7 @@ class Appointment extends Equatable {
     required this.durationInMinutes,
     required this.type,
     required this.status,
-    required this.notes,
+    this.notes,
     this.practitioner,
     this.patient,
   });
@@ -29,7 +29,7 @@ class Appointment extends Equatable {
   final int durationInMinutes;
   final AppointmentType type;
   final AppointmentStatus status;
-  final String notes;
+  final String? notes;
   @JsonKey(includeToJson: false)
   final UserName? practitioner;
   @JsonKey(includeToJson: false)

@@ -25,7 +25,7 @@ class NextAppointment extends HookConsumerWidget {
               tileColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: radius8),
               leading: CircleAvatar(
-                backgroundColor: AppTheme.textSecondary.withOpacity(0.2),
+                backgroundColor: AppTheme.textSecondary.withAlpha(20),
                 child: const Icon(
                   CupertinoIcons.calendar,
                   color: AppTheme.textSecondary,

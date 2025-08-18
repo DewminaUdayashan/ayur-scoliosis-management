@@ -15,7 +15,7 @@ Appointment _$AppointmentFromJson(Map<String, dynamic> json) => Appointment(
   durationInMinutes: (json['durationInMinutes'] as num).toInt(),
   type: $enumDecode(_$AppointmentTypeEnumMap, json['type']),
   status: $enumDecode(_$AppointmentStatusEnumMap, json['status']),
-  notes: json['notes'] as String,
+  notes: json['notes'] as String?,
   practitioner: json['practitioner'] == null
       ? null
       : UserName.fromJson(json['practitioner'] as Map<String, dynamic>),
