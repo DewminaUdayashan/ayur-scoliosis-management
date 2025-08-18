@@ -7,7 +7,6 @@ part of 'practitioner.dart';
 // **************************************************************************
 
 Practitioner _$PractitionerFromJson(Map<String, dynamic> json) => Practitioner(
-  phone: json['phone'] as String,
   specialty: json['specialty'] as String,
   medicalLicense: json['medicalLicense'] as String,
   status: $enumDecode(_$AccountStatusEnumMap, json['status']),
@@ -19,7 +18,6 @@ Practitioner _$PractitionerFromJson(Map<String, dynamic> json) => Practitioner(
 
 Map<String, dynamic> _$PractitionerToJson(Practitioner instance) =>
     <String, dynamic>{
-      'phone': instance.phone,
       'specialty': instance.specialty,
       'medicalLicense': instance.medicalLicense,
       'status': _$AccountStatusEnumMap[instance.status]!,

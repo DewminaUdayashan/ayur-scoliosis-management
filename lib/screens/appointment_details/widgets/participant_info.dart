@@ -1,5 +1,6 @@
 import 'package:ayur_scoliosis_management/core/extensions/theme.dart';
 import 'package:ayur_scoliosis_management/providers/appointment/appointment_details.dart';
+import 'package:ayur_scoliosis_management/providers/patient/patient_details.dart';
 import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -18,6 +19,10 @@ class ParticipantInfoWidget extends HookConsumerWidget {
     final appointmentAsync = ref.watch(
       appointmentDetailsProvider(appointmentId),
     );
+    final appointment = appointmentAsync.valueOrNull;
+    final patient = ref
+        .watch(patientDetailsProvider(appointment?.patientId))
+        .valueOrNull;
 
     return appointmentAsync.when(
       data: (appointment) => Row(
@@ -25,10 +30,7 @@ class ParticipantInfoWidget extends HookConsumerWidget {
         children: [
           Column(
             children: [
-              const PatientProfileAvatar(
-                size: 60,
-                //TODO: Show real images
-              ),
+              PatientProfileAvatar(size: 60, url: appointment.patientId),
               const SizedBox(height: 8),
               Text(
                 'Dr. ${appointment.practitioner!.firstName}',
@@ -53,10 +55,7 @@ class ParticipantInfoWidget extends HookConsumerWidget {
           ),
           Column(
             children: [
-              const PatientProfileAvatar(
-                size: 60,
-                // Dummy image for patient
-              ),
+              PatientProfileAvatar(size: 60, url: patient?.imageUrl),
               const SizedBox(height: 8),
               Text(
                 appointment.patient!.firstName,

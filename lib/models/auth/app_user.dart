@@ -16,15 +16,18 @@ class AppUser extends Equatable {
     required this.role,
     required this.mustChangePassword,
     required this.joinedDate,
+    this.phone,
     this.imageUrl,
     this.practitioner,
     this.patient,
+    this.lastAppointmentDate,
   });
 
   final String id;
   final String firstName;
   final String lastName;
   final String email;
+  final String? phone;
   final UserRole role;
   final bool mustChangePassword;
   final DateTime joinedDate;
@@ -32,9 +35,11 @@ class AppUser extends Equatable {
   final String? imageUrl;
   final Practitioner? practitioner;
   final Patient? patient;
+  final DateTime? lastAppointmentDate;
 
   bool get isPractitioner => practitioner != null;
   bool get isPatient => patient != null;
+  String get fullName => '$firstName $lastName';
 
   factory AppUser.fromJson(Map<String, dynamic> json) =>
       _$AppUserFromJson(json);

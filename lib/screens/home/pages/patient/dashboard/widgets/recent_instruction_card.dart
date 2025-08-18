@@ -18,7 +18,7 @@ class RecentInstructionCard extends StatelessWidget {
       child: ListTile(
         tileColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: radius8),
-        leading: const PatientProfileAvatar(), // Practitioner's avatar
+        leading: const PatientProfileAvatar(url: null),
         title: RichText(
           text: TextSpan(
             text: 'Dr. John Doe',
