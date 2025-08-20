@@ -69,7 +69,7 @@ class PatientAppointmentCard extends HookConsumerWidget {
                       spacing: 4,
                       children: [
                         Text(
-                          'Appointment with Dr.${appointment.practitioner?.firstName}',
+                          '${appointment.name} - Dr.${appointment.practitioner?.firstName}',
                           style: context.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),

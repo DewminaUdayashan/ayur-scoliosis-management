@@ -29,10 +29,10 @@ class AppointmentActionButton extends HookConsumerWidget {
     final formKey = useMemoized(() => GlobalKey<FormState>());
 
     // Function to show change request dialog
-    Future<String?> showChangeRequestDialog() async {
+    Future showChangeRequestDialog() async {
       final reasonController = TextEditingController();
 
-      return showDialog<String>(
+      return showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
@@ -67,7 +67,7 @@ class AppointmentActionButton extends HookConsumerWidget {
             ),
             actions: [
               TextButton(
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () => context.pop(false),
                 child: const Text('Cancel'),
               ),
               ElevatedButton(
@@ -104,7 +104,8 @@ class AppointmentActionButton extends HookConsumerWidget {
                     isLoading: isLoading.value,
                     backgroundColor: AppTheme.error,
                     onPressed: () async {
-                      final String? reason = await showChangeRequestDialog();
+                      final reason = await showChangeRequestDialog();
+                      if (reason == false) return;
                       if (reason != null && reason.isNotEmpty) {
                         isLoading.value = true;
                         await ref

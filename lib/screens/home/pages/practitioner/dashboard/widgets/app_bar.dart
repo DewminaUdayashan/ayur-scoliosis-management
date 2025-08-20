@@ -1,6 +1,5 @@
 import 'package:ayur_scoliosis_management/providers/profile/profile.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:ayur_scoliosis_management/widgets/profile_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -25,17 +24,7 @@ class PractitionerAppBar extends HookConsumerWidget {
             data: (profile) => Row(
               spacing: 8,
               children: [
-                CircleAvatar(
-                  backgroundImage: profile.imageUrl != null
-                      ? CachedNetworkImageProvider(profile.imageUrl!)
-                      : null,
-                  child: profile.imageUrl == null
-                      ? const Icon(
-                          CupertinoIcons.person_fill,
-                          color: AppTheme.accent,
-                        )
-                      : null,
-                ),
+                ProfileAvatar(),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.end,

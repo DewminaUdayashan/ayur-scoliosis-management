@@ -1,5 +1,6 @@
 import 'package:ayur_scoliosis_management/providers/profile/profile.dart';
 import 'package:ayur_scoliosis_management/widgets/default_app_bar.dart';
+import 'package:ayur_scoliosis_management/widgets/profile_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -17,10 +18,7 @@ class PatientAppBar extends HookConsumerWidget {
       title: profileAsync.when(
         data: (profile) => Row(
           children: [
-            const CircleAvatar(
-              // In a real app, this would show the patient's profile image
-              backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=5'),
-            ),
+            ProfileAvatar(),
             const SizedBox(width: 12),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
