@@ -1,6 +1,5 @@
 import 'package:ayur_scoliosis_management/core/enums.dart';
 import 'package:ayur_scoliosis_management/models/patient/invite_patient_payload.dart';
-import 'package:ayur_scoliosis_management/providers/patient/patients.dart';
 import 'package:ayur_scoliosis_management/widgets/buttons/primary_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +11,7 @@ import '../../../../../../core/extensions/size.dart';
 import '../../../../../../core/extensions/theme.dart';
 import '../../../../../../core/extensions/validators.dart';
 import '../../../../../../core/theme.dart';
+import '../../../../../../providers/patient/patients.dart';
 import '../../../../../../widgets/app_text_form_field.dart';
 
 class InvitePatientSheet extends HookConsumerWidget {
@@ -29,6 +29,7 @@ class InvitePatientSheet extends HookConsumerWidget {
     final emailController = useTextEditingController();
     final selectedGender = useState<Gender?>(null);
     final genderController = useTextEditingController();
+    final phoneController = useTextEditingController();
 
     final isLoading = useState(false);
 
@@ -95,10 +96,11 @@ class InvitePatientSheet extends HookConsumerWidget {
       if (formKey.currentState?.validate() ?? false) {
         isLoading.value = true;
         await ref
-            .read(patientsProvider.notifier)
+            .read(patientsProvider(null).notifier)
             .invitePatient(
               InvitePatientPayload(
                 email: emailController.text,
+                phone: phoneController.text,
                 firstName: firstNameController.text,
                 lastName: lastNameController.text,
                 dateOfBirth: dateOfBirth.value!,
@@ -187,6 +189,16 @@ class InvitePatientSheet extends HookConsumerWidget {
               onTap: selectGender,
               validator: (value) => value == null || value.isEmpty
                   ? 'Please select gender'
+                  : null,
+            ),
+            const SizedBox(height: 16),
+            AppTextFormField(
+              controller: phoneController,
+              labelText: 'Phone Number',
+              prefixIcon: CupertinoIcons.phone,
+              keyboardType: TextInputType.phone,
+              validator: (value) => value == null || value.isEmpty
+                  ? 'Please enter a phone number'
                   : null,
             ),
             const SizedBox(height: 16),
