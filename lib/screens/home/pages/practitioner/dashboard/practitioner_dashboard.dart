@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -8,7 +7,7 @@ import '../../../../../widgets/page_title.dart';
 import '../../../../../widgets/sliver_sized_box.dart';
 import 'widgets/activity_card.dart';
 import 'widgets/app_bar.dart';
-import 'widgets/appointment_card.dart';
+import 'widgets/practitioner_todays_appointments.dart';
 
 class PractitionerDashboard extends HookConsumerWidget {
   const PractitionerDashboard({super.key});
@@ -18,12 +17,12 @@ class PractitionerDashboard extends HookConsumerWidget {
       padding: horizontalPadding,
       child: CustomScrollView(
         slivers: [
-          PractitionerAppBar(),
-          SliverSizedBox(height: 20),
-          PageTitle(title: 'Today\'s Appointments'),
-          AppointmentCard().sliverToBoxAdapter,
-          SliverSizedBox(height: 20),
-          PageTitle(title: 'Recent Activities'),
+          const PractitionerAppBar(),
+          const SliverSizedBox(height: 20),
+          const PageTitle(title: 'Today\'s Appointments'),
+          const PractitionerTodaysAppointments(),
+          const SliverSizedBox(height: 20),
+          const PageTitle(title: 'Recent Activities'),
           ActivityCard().sliverToBoxAdapter,
         ],
       ),

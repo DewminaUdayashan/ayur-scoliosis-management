@@ -34,8 +34,9 @@ class AppointmentServiceImpl extends AppointmentService {
         response.data,
         (json) => Appointment.fromJson(json as Map<String, dynamic>),
       );
-    } on DioException catch (e) {
+    } on DioException catch (e, stack) {
       Log.e('Error fetching appointments: ${e.message}');
+      Log.e('Stack trace: $stack');
       throw e.processException();
     }
   }
