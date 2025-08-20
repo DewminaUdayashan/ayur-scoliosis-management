@@ -98,7 +98,6 @@ class PatientSchedule extends HookConsumerWidget {
                           Container(decoration: decoration),
                     ),
                   ),
-
                   // --- APPOINTMENTS LIST ---
                 ],
               ),
