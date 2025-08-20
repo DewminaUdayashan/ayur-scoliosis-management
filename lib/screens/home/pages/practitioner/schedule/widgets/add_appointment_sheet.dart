@@ -1,62 +1,93 @@
+import 'package:ayur_scoliosis_management/core/utils/logger.dart';
+import 'package:ayur_scoliosis_management/models/appointment/schedule_appointment_payload.dart';
+import 'package:ayur_scoliosis_management/models/auth/app_user.dart';
+import 'package:ayur_scoliosis_management/providers/appointment/appointments.dart';
+import 'package:ayur_scoliosis_management/providers/patient/patients.dart';
+import 'package:ayur_scoliosis_management/widgets/buttons/primary_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../../../core/enums.dart';
 import '../../../../../../core/extensions/theme.dart';
 import '../../../../../../core/theme.dart';
-import '../../../../../../models/patient/patient.dart';
 
-class AddAppointmentSheet extends HookWidget {
+class AddAppointmentSheet extends HookConsumerWidget {
   const AddAppointmentSheet({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // --- FORM STATE & CONTROLLERS ---
+  Widget build(BuildContext context, WidgetRef ref) {
+    final searchQuery = useState<String?>(null);
     final formKey = useMemoized(() => GlobalKey<FormState>());
+    final appointmentNameController = useTextEditingController();
     final dateController = useTextEditingController();
     final timeController = useTextEditingController();
-    final searchController = useMemoized(
-      () => SearchController(),
-    ); // For SearchAnchor
-    final selectedPatient = useState<Patient?>(null);
-    final sessionType = useState<SessionType>(SessionType.physical);
+    final durationController = useTextEditingController();
+    final notesController = useTextEditingController();
+    final searchController = useMemoized(() => SearchController());
+    final selectedPatient = useState<AppUser?>(null);
+    final sessionType = useState<AppointmentType>(AppointmentType.physical);
+    final isSubmitting = useState<bool>(false);
+    final selectedTime = useState<TimeOfDay?>(null);
+    final errorText = useState<String?>(null);
 
-    // --- DUMMY DATA ---
-    final List<Patient> patients = [
-      Patient(
-        profileImageUrl: 'https://i.pravatar.cc/150?img=5',
-        dateOfBirth: DateTime(1998, 5, 12),
-        gender: Gender.female,
-      ),
-      Patient(
-        profileImageUrl: 'https://i.pravatar.cc/150?img=12',
-        dateOfBirth: DateTime(2001, 9, 23),
-        gender: Gender.male,
-      ),
-      Patient(
-        profileImageUrl: 'https://i.pravatar.cc/150?img=32',
-        dateOfBirth: DateTime(1995, 2, 8),
-        gender: Gender.female,
-      ),
-      Patient(
-        profileImageUrl: null, // Example with no profile image
-        dateOfBirth: DateTime(2003, 11, 30),
-        gender: Gender.male,
-      ),
-    ];
-
-    // --- FORM SUBMISSION LOGIC (Unchanged) ---
-    void submitForm() {
+    // --- FORM SUBMISSION LOGIC ---
+    Future<void> submitForm() async {
       if (formKey.currentState?.validate() ?? false) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Appointment Saved!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        Navigator.pop(context);
+        isSubmitting.value = true;
+
+        try {
+          // Parse date and time
+          final dateStr = dateController.text;
+          final timeOfDay = selectedTime.value;
+
+          if (dateStr.isEmpty || timeOfDay == null) {
+            throw Exception('Please select both date and time');
+          }
+
+          // Parse the date
+          final parsedDate = DateFormat.yMMMMd().parse(dateStr);
+
+          // Combine date and time using the actual TimeOfDay object
+          final appointmentDateTime = DateTime(
+            parsedDate.year,
+            parsedDate.month,
+            parsedDate.day,
+            timeOfDay.hour,
+            timeOfDay.minute,
+          );
+
+          // Parse duration
+          final duration = int.parse(durationController.text);
+
+          // Create appointment payload
+          final payload = ScheduleAppointmentPayload(
+            name: appointmentNameController.text,
+            patientId: selectedPatient.value!.id,
+            date: appointmentDateTime,
+            durationMinutes: duration,
+            type: sessionType.value,
+            notes: notesController.text.isEmpty ? null : notesController.text,
+          );
+
+          // Schedule appointment using the provider
+          await ref
+              .read(appointmentsProvider().notifier)
+              .scheduleAppointment(payload);
+
+          // Close the sheet on success
+          if (context.mounted) {
+            context.pop();
+          }
+        } catch (e) {
+          Log.e(e);
+          errorText.value = e.toString();
+        } finally {
+          isSubmitting.value = false;
+        }
       }
     }
 
@@ -93,9 +124,21 @@ class AddAppointmentSheet extends HookWidget {
             ),
             const SizedBox(height: 24),
 
+            // --- APPOINTMENT NAME ---
+            TextFormField(
+              controller: appointmentNameController,
+              decoration: _inputDecoration(
+                label: 'Appointment Name',
+                icon: CupertinoIcons.text_cursor,
+              ),
+              validator: (value) => value == null || value.isEmpty
+                  ? 'Please enter an appointment name'
+                  : null,
+            ),
+            const SizedBox(height: 16),
+
             // --- PATIENT SEARCH ANCHOR ---
-            // We wrap the SearchAnchor in a FormField for validation.
-            FormField<Patient>(
+            FormField<AppUser>(
               initialValue: selectedPatient.value,
               validator: (value) {
                 if (value == null) {
@@ -106,7 +149,6 @@ class AddAppointmentSheet extends HookWidget {
               builder: (formFieldState) {
                 return SearchAnchor(
                   searchController: searchController,
-                  // This builder creates the clickable field that opens the search view.
                   builder: (context, controller) {
                     return TextFormField(
                       controller: controller,
@@ -118,33 +160,83 @@ class AddAppointmentSheet extends HookWidget {
                         errorText: formFieldState.errorText,
                       ).copyWith(hintText: 'Select Patient'),
                       onTap: () => controller.openView(),
-                      // We use the controller's text, which is set when a suggestion is tapped.
                     );
                   },
-                  // This builder creates the list of suggestions in the search view.
                   suggestionsBuilder: (context, controller) {
-                    final query = controller.text.toLowerCase();
-                    // final filteredPatients = patients.where(
-                    //   (patient) =>
-                    //       patient.firstName.toLowerCase().contains(query),
-                    // );
+                    final searchText = controller.text.toLowerCase();
 
-                    return patients.map((patient) {
-                      return ListTile(
-                        title: Text("Name"),
-                        onTap: () {
-                          // When a patient is tapped:
-                          selectedPatient.value = patient;
-                          formFieldState.didChange(
-                            patient,
-                          ); // Update the FormField
-                          ////TODO: close with real resutl value
-                          controller.closeView(
-                            "RESULT",
-                          ); // Close search and set text
+                    // Update search query when text changes
+                    if (searchQuery.value != searchText) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        searchQuery.value = searchText;
+                      });
+                    }
+
+                    // Use StatefulBuilder to manage local state and trigger rebuilds
+                    return [
+                      StatefulBuilder(
+                        builder: (context, setState) {
+                          // Use a Consumer to watch the provider
+                          return Consumer(
+                            builder: (context, ref, child) {
+                              final patientsAsyncValue = ref.watch(
+                                patientsProvider(searchText),
+                              );
+
+                              return patientsAsyncValue.when(
+                                data: (pages) {
+                                  final patientsList = pages
+                                      .map((page) => page.data)
+                                      .expand((patient) => patient)
+                                      .toList();
+
+                                  if (patientsList.isEmpty) {
+                                    return const ListTile(
+                                      title: Text('No patients found'),
+                                      enabled: false,
+                                    );
+                                  }
+
+                                  // Return a Column containing all patient tiles
+                                  return Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: patientsList.map((patient) {
+                                      return ListTile(
+                                        title: Text(patient.fullName),
+                                        subtitle: Text(patient.email),
+                                        onTap: () {
+                                          selectedPatient.value = patient;
+                                          formFieldState.didChange(patient);
+                                          controller.closeView(
+                                            patient.fullName,
+                                          );
+                                        },
+                                      );
+                                    }).toList(),
+                                  );
+                                },
+                                loading: () => const ListTile(
+                                  title: Text('Searching patients...'),
+                                  leading: SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                                  enabled: false,
+                                ),
+                                error: (error, stackTrace) => ListTile(
+                                  title: const Text('Error loading patients'),
+                                  subtitle: Text(error.toString()),
+                                  enabled: false,
+                                ),
+                              );
+                            },
+                          );
                         },
-                      );
-                    }).toList();
+                      ),
+                    ];
                   },
                 );
               },
@@ -188,13 +280,36 @@ class AddAppointmentSheet extends HookWidget {
                         context: context,
                         initialTime: TimeOfDay.now(),
                       );
-                      if (pickedTime != null) {
+                      if (pickedTime != null && context.mounted) {
+                        selectedTime.value =
+                            pickedTime; // Store the actual TimeOfDay
                         timeController.text = pickedTime.format(context);
                       }
                     },
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 16),
+
+            // --- DURATION ---
+            TextFormField(
+              controller: durationController,
+              decoration: _inputDecoration(
+                label: 'Duration (minutes)',
+                icon: CupertinoIcons.hourglass,
+              ),
+              keyboardType: TextInputType.number,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter duration';
+                }
+                final duration = int.tryParse(value);
+                if (duration == null || duration <= 0) {
+                  return 'Please enter a valid duration';
+                }
+                return null;
+              },
             ),
             const SizedBox(height: 24),
 
@@ -203,15 +318,15 @@ class AddAppointmentSheet extends HookWidget {
             const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
-              child: SegmentedButton<SessionType>(
+              child: SegmentedButton<AppointmentType>(
                 segments: const [
                   ButtonSegment(
-                    value: SessionType.physical,
+                    value: AppointmentType.physical,
                     label: Text('Physical'),
                     icon: Icon(CupertinoIcons.building_2_fill),
                   ),
                   ButtonSegment(
-                    value: SessionType.remote,
+                    value: AppointmentType.remote,
                     label: Text('Remote'),
                     icon: Icon(CupertinoIcons.video_camera_solid),
                   ),
@@ -220,28 +335,34 @@ class AddAppointmentSheet extends HookWidget {
                 onSelectionChanged: (newSelection) =>
                     sessionType.value = newSelection.first,
                 style: SegmentedButton.styleFrom(
-                  selectedBackgroundColor: AppTheme.accent.withOpacity(0.2),
+                  selectedBackgroundColor: AppTheme.accent.withAlpha(50),
                   selectedForegroundColor: AppTheme.accent,
                 ),
               ),
             ),
+            const SizedBox(height: 24),
+
+            // --- NOTES (Optional) ---
+            TextFormField(
+              controller: notesController,
+              decoration: _inputDecoration(
+                label: 'Notes (Optional)',
+                icon: CupertinoIcons.doc_text,
+              ),
+              maxLines: 3,
+              textInputAction: TextInputAction.newline,
+            ),
+            if (errorText.value != null) ...[
+              SizedBox(height: 12),
+              Text(errorText.value!, style: TextStyle(color: Colors.red)),
+            ],
             const SizedBox(height: 32),
 
-            // --- SAVE BUTTON (Unchanged) ---
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: submitForm,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.accent,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: const Text('Save Appointment'),
-              ),
+            // --- SAVE BUTTON ---
+            PrimaryButton(
+              isLoading: isSubmitting.value,
+              label: 'Save Appointment',
+              onPressed: isSubmitting.value ? null : submitForm,
             ),
             const SizedBox(height: 24),
           ],

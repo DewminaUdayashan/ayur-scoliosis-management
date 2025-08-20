@@ -1,9 +1,13 @@
 import 'package:ayur_scoliosis_management/core/enums.dart';
 import 'package:ayur_scoliosis_management/models/appointment/appointment.dart';
+import 'package:ayur_scoliosis_management/models/appointment/schedule_appointment_payload.dart';
 import 'package:ayur_scoliosis_management/models/common/paginated/paginated.dart';
 import 'package:ayur_scoliosis_management/models/common/paginated/paginated_request.dart';
+import 'package:ayur_scoliosis_management/providers/appointment/appointment_dates.dart';
 import 'package:ayur_scoliosis_management/providers/appointment/appointment_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../core/utils/snacks.dart';
 
 part 'appointments.g.dart';
 
@@ -68,5 +72,21 @@ class Appointments extends _$Appointments {
   void sortOrder(SortOrder sortOrder) {
     _sortOrder = sortOrder;
     ref.invalidateSelf();
+  }
+
+  Future<void> scheduleAppointment(
+    ScheduleAppointmentPayload appointment,
+  ) async {
+    try {
+      await ref
+          .read(appointmentServiceProvider)
+          .scheduleAppointment(appointment);
+      ref.invalidateSelf();
+      ref.invalidate(appointmentDatesProvider);
+      showSuccessSnack('Appointment created successfully!');
+    } catch (e) {
+      showErrorSnack(e.toString());
+      rethrow;
+    }
   }
 }

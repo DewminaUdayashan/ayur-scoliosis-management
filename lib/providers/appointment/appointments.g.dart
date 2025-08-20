@@ -6,7 +6,7 @@ part of 'appointments.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$appointmentsHash() => r'c0061e8c48b3fa1d0d12c53d009d2d327a8e071a';
+String _$appointmentsHash() => r'27e138878ace64191c07f4c6cb8af23857ccf206';
 
 /// Copied from Dart SDK
 class _SystemHash {
