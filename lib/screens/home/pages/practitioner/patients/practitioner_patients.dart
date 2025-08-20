@@ -2,10 +2,8 @@ import 'package:ayur_scoliosis_management/widgets/skeleton.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../../../core/app_router.dart';
 import '../../../../../core/constants/size.dart';
 import '../../../../../core/extensions/size.dart';
 import '../../../../../core/extensions/theme.dart';
@@ -13,8 +11,8 @@ import '../../../../../core/extensions/widgets.dart';
 import '../../../../../core/theme.dart';
 import '../../../../../providers/patient/patients.dart';
 import '../../../../../widgets/app_text_field.dart';
-import '../../../../../widgets/patient_profile_avatar.dart';
 import 'widgets/invite_patient_sheet.dart';
+import 'widgets/patient_list_tile.dart';
 
 class PractitionerPatients extends HookConsumerWidget {
   const PractitionerPatients({super.key});
@@ -84,7 +82,7 @@ class PractitionerPatients extends HookConsumerWidget {
                   pinned: true,
                 ),
                 Padding(
-                  padding: horizontalPadding,
+                  padding: horizontalPadding.copyWith(bottom: 16),
                   child: AppTextField(
                     hintText: 'Search patients...',
                     onChanged: (value) => searchQuery.value = value,
@@ -101,16 +99,7 @@ class PractitionerPatients extends HookConsumerWidget {
                       itemCount: patients.length,
                       itemBuilder: (context, index) {
                         final patient = patients[index];
-                        return ListTile(
-                          leading: PatientProfileAvatar(url: patient.imageUrl),
-                          title: Text(patient.firstName),
-                          subtitle: Text('Condition: '),
-                          trailing: Text('Last Visit: '),
-                          onTap: () => context.push(
-                            AppRouter.patientDetails,
-                            extra: {'id': patient.id},
-                          ),
-                        );
+                        return PatientListTile(patient: patient);
                       },
                     );
                   },

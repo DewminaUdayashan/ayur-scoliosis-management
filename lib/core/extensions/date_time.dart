@@ -9,5 +9,7 @@ extension DateTimeExtension on DateTime {
 
   String get yMMMMd => DateFormat.yMMMMd().format(toLocal());
 
+  String get yMd => DateFormat.yMd().format(toLocal());
+
   String get jm => DateFormat.jm().format(toLocal());
 }
