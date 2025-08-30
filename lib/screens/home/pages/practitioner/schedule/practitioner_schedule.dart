@@ -1,3 +1,5 @@
+import 'package:ayur_scoliosis_management/screens/home/pages/practitioner/schedule/widgets/practitioner_appointment_card.dart';
+import 'package:ayur_scoliosis_management/screens/home/pages/practitioner/schedule/widgets/practitioner_calendar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -7,7 +9,9 @@ import 'package:table_calendar/table_calendar.dart';
 
 import '../../../../../core/extensions/theme.dart';
 import '../../../../../core/theme.dart';
-import '../../../../../gen/assets.gen.dart';
+import '../../../../../providers/appointment/appointments.dart';
+import '../../../../../widgets/skeleton.dart';
+import '../../../../../widgets/sliver_sized_box.dart';
 import 'widgets/add_appointment_sheet.dart';
 
 /// Data model for a single appointment.
@@ -32,29 +36,13 @@ class PractitionerSchedule extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // --- STATE MANAGEMENT ---
-    // Use hooks to manage the calendar's state.
-    final focusedDay = useState(DateTime.now());
     final selectedDay = useState(DateTime.now());
-
-    // --- DUMMY DATA ---
-    // Sample data for appointments. In a real app, this would come from a provider.
-    final List<_Appointment> appointments = [
-      _Appointment(
-        title: 'Physical Therapy',
-        time: '10:00 AM',
-        patientName: 'Olivia Chen',
-        avatarUrl: Assets.images.logo, // Placeholder
-        color: Colors.blue,
+    final appointmentsAsync = ref.watch(
+      appointmentsProvider(
+        startDate: selectedDay.value,
+        endDate: selectedDay.value.add(Duration(days: 1)),
       ),
-      _Appointment(
-        title: 'Video Call',
-        time: '11:00 AM',
-        patientName: 'Benjamin Carter',
-        avatarUrl: Assets.images.logo, // Placeholder
-        color: Colors.lightBlue.shade300,
-      ),
-    ];
+    );
 
     return Scaffold(
       // Use Scaffold for a standard layout structure.
@@ -90,10 +78,14 @@ class PractitionerSchedule extends HookConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // --- CALENDAR CARD ---
-                      _buildCalendarCard(context, focusedDay, selectedDay),
                       const SizedBox(height: 24),
-
+                      // --- CALENDAR CARD ---
+                      PractitionerCalendar(
+                        onDaySelected: (day) {
+                          selectedDay.value = day;
+                        },
+                      ),
+                      const SizedBox(height: 30),
                       // --- APPOINTMENTS HEADER ---
                       Text(
                         'Appointments for ${DateFormat.yMMMMd().format(selectedDay.value)}',
@@ -101,29 +93,52 @@ class PractitionerSchedule extends HookConsumerWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 16),
-
-                      // --- APPOINTMENTS LIST ---
-                      ListView.separated(
-                        itemCount: appointments.length,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        separatorBuilder: (context, index) =>
-                            const SizedBox(height: 12),
-                        itemBuilder: (context, index) {
-                          return _AppointmentCard(
-                            appointment: appointments[index],
-                          );
+                      appointmentsAsync.when(
+                        data: (data) {
+                          final appointments = data
+                              .map((page) => page.data)
+                              .toList()
+                              .expand((x) => x)
+                              .toList();
+                          if (appointments.isEmpty) {
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 24.0),
+                              child: const Center(
+                                child: Text('No appointments for this day.'),
+                              ),
+                            );
+                          } else {
+                            return ListView.separated(
+                              padding: const EdgeInsets.only(top: 20),
+                              itemCount: appointments.length,
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              separatorBuilder: (context, index) =>
+                                  const SizedBox(height: 12),
+                              itemBuilder: (context, index) {
+                                return PractitionerAppointmentCard(
+                                  appointment: appointments[index],
+                                );
+                              },
+                            );
+                          }
                         },
+                        error: (_, __) => const Center(
+                          child: Text('Error loading appointments'),
+                        ),
+                        loading: () => Skeleton(
+                          builder: (decoration) =>
+                              Container(decoration: decoration),
+                        ),
                       ),
                     ],
                   ),
                 ),
               ),
+              SliverSizedBox(height: 100),
             ],
           ),
 
-          // --- FLOATING ACTION BUTTON ---
           Positioned(
             bottom: 20,
             right: 20,

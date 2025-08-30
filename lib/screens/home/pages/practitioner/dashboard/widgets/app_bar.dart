@@ -1,3 +1,4 @@
+import 'package:ayur_scoliosis_management/providers/auth/auth.dart';
 import 'package:ayur_scoliosis_management/providers/profile/profile.dart';
 import 'package:ayur_scoliosis_management/widgets/profile_avatar.dart';
 import 'package:flutter/material.dart';
@@ -49,7 +50,10 @@ class PractitionerAppBar extends HookConsumerWidget {
           ),
           Spacer(),
           IconButton(
-            onPressed: () {},
+            onPressed: () async {
+              ///TODO: Remove this test code
+              ref.read(authProvider.notifier).signOut();
+            },
             icon: Badge.count(
               count: 2,
               child: Icon(Icons.notifications, color: AppTheme.textSecondary),

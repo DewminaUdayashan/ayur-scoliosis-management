@@ -5,7 +5,7 @@ class Api {
 
   // For development on different platforms
   static String get baseUrl {
-    return 'http://192.168.1.100:3000'; // Default to localhost for development
+    return 'http://192.168.1.104:3000'; // Default to localhost for development
   }
 
   static final _apiPath = '/';
@@ -22,6 +22,7 @@ class Api {
 
   /// Patient endpoints
   String get patientPath => '$_apiPath/patient';
+  String get patients => '$patientPath/patients';
   String get invitePatient => '$patientPath/invite';
   String patientDetails(String id) => '$patientPath/$id';
 

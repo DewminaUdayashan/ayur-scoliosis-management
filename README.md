@@ -210,3 +210,13 @@ For support and questions:
 ---
 
 **Note**: This is an academic/research project focused on exploring the integration of traditional Ayurvedic medicine with modern technology for scoliosis management.
+
+## Run migration
+- npx prisma migrate dev --name <<NAME>>
+- npx prisma migrate deploy
+
+## Demo Logins 
+Password for demo accounts : Test@123
+Emails for demo accounts:
+- Practitioner : givej64432@ahvin.com
+- Patient: logigi3558@aravites.com

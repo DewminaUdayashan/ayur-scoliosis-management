@@ -13,7 +13,7 @@ class PatientProfileAvatar extends StatelessWidget {
       radius: size != null ? size! / 2 : null,
       backgroundImage: url != null ? CachedNetworkImageProvider(url!) : null,
       child: url == null
-          ? const Icon(CupertinoIcons.person_fill, size: 40)
+          ? const Icon(CupertinoIcons.person_fill, size: 26)
           : null,
     );
   }

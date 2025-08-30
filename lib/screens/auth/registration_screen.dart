@@ -28,6 +28,7 @@ class PractitionerRegistrationScreen extends HookConsumerWidget {
     final obscurePassword = useState(true);
     final obscureConfirmPassword = useState(true);
     final passwordController = useTextEditingController();
+    final confirmPasswordController = useTextEditingController();
     final emailController = useTextEditingController();
     final firstNameController = useTextEditingController();
     final lastNameController = useTextEditingController();
@@ -139,6 +140,7 @@ class PractitionerRegistrationScreen extends HookConsumerWidget {
                     specialtyController: specialtyController,
                     medicalLicenseController: medicalLicenseController,
                     passwordController: passwordController,
+                    confirmPasswordController: confirmPasswordController,
                     obscurePassword: obscurePassword,
                     obscureConfirmPassword: obscureConfirmPassword,
                     onNext: goToNextStep,
@@ -176,6 +178,7 @@ class _PersonalDetailsForm extends HookConsumerWidget {
     required this.specialtyController,
     required this.medicalLicenseController,
     required this.passwordController,
+    required this.confirmPasswordController,
     required this.obscurePassword,
     required this.obscureConfirmPassword,
     required this.onNext,
@@ -189,6 +192,7 @@ class _PersonalDetailsForm extends HookConsumerWidget {
   final TextEditingController specialtyController;
   final TextEditingController medicalLicenseController;
   final TextEditingController passwordController;
+  final TextEditingController confirmPasswordController;
   final ValueNotifier<bool> obscurePassword;
   final ValueNotifier<bool> obscureConfirmPassword;
   final VoidCallback onNext;
@@ -252,11 +256,24 @@ class _PersonalDetailsForm extends HookConsumerWidget {
               hintText: 'Enter your password',
               controller: passwordController,
               obscureText: obscure,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Password is required';
+                }
+                if (value.length < 8) {
+                  return 'Password must be at least 8 characters long';
+                }
+                if (!RegExp(
+                  r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)',
+                ).hasMatch(value)) {
+                  return 'Password must contain at least one uppercase letter, one lowercase letter, and one number';
+                }
+                return null;
+              },
               suffix: IconButton(
                 icon: Icon(obscure ? Icons.visibility_off : Icons.visibility),
                 onPressed: () => obscurePassword.value = !obscure,
               ),
-              // validator: (v) => v!.passwordLengthValidator,
             ),
           ),
           const SizedBox(height: 16),
@@ -264,13 +281,21 @@ class _PersonalDetailsForm extends HookConsumerWidget {
             (obscure) => AppTextField(
               labelText: 'Confirm Password',
               hintText: 'Re-enter your password',
+              controller: confirmPasswordController,
               obscureText: obscure,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please confirm your password';
+                }
+                if (value != passwordController.text) {
+                  return 'Passwords do not match';
+                }
+                return null;
+              },
               suffix: IconButton(
                 icon: Icon(obscure ? Icons.visibility_off : Icons.visibility),
                 onPressed: () => obscureConfirmPassword.value = !obscure,
               ),
-              // validator: (v) =>
-              //     v!.confirmPasswordValidator(passwordController.text),
             ),
           ),
           const SizedBox(height: 32),

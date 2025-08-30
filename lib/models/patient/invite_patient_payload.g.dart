@@ -10,6 +10,7 @@ Map<String, dynamic> _$InvitePatientPayloadToJson(
   InvitePatientPayload instance,
 ) => <String, dynamic>{
   'email': instance.email,
+  'phone': instance.phone,
   'firstName': instance.firstName,
   'lastName': instance.lastName,
   'dateOfBirth': instance.dateOfBirth.toIso8601String(),

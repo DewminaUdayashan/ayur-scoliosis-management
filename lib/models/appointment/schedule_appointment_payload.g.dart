@@ -9,14 +9,15 @@ part of 'schedule_appointment_payload.dart';
 Map<String, dynamic> _$ScheduleAppointmentPayloadToJson(
   ScheduleAppointmentPayload instance,
 ) => <String, dynamic>{
+  'name': instance.name,
   'patientId': instance.patientId,
   'appointmentDateTime': instance.date.toIso8601String(),
   'durationInMinutes': instance.durationMinutes,
-  'type': _$SessionTypeEnumMap[instance.type]!,
+  'type': _$AppointmentTypeEnumMap[instance.type]!,
   'notes': instance.notes,
 };
 
-const _$SessionTypeEnumMap = {
-  SessionType.physical: 'physical',
-  SessionType.remote: 'remote',
+const _$AppointmentTypeEnumMap = {
+  AppointmentType.physical: 'Physical',
+  AppointmentType.remote: 'Remote',
 };

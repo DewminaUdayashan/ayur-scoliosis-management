@@ -7,12 +7,14 @@ part 'invite_patient_payload.g.dart';
 class InvitePatientPayload {
   InvitePatientPayload({
     required this.email,
+    required this.phone,
     required this.firstName,
     required this.lastName,
     required this.dateOfBirth,
     required this.gender,
   });
   final String email;
+  final String phone;
   final String firstName;
   final String lastName;
   final DateTime dateOfBirth;

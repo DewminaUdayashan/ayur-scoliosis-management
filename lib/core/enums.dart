@@ -15,10 +15,9 @@ enum ApiResponseCode {
 
 enum SessionType { physical, remote }
 
+@JsonEnum(valueField: 'value')
 enum AppointmentType {
-  @JsonValue('Physical')
   physical('Physical'),
-  @JsonValue('Remote')
   remote('Remote');
 
   const AppointmentType(this.value);
