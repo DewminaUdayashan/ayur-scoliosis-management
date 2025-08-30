@@ -1,0 +1,26 @@
+import 'package:ayur_scoliosis_management/core/utils/api.dart';
+import 'package:ayur_scoliosis_management/models/xray/xray.dart';
+import 'package:ayur_scoliosis_management/services/xray/xray_service.dart';
+import 'package:dio/dio.dart';
+
+class XRayServiceImpl extends XRayService {
+  XRayServiceImpl({required this.api, required this.client});
+  final Api api;
+  final Dio client;
+
+  @override
+  Future<bool> uploadXRay(XRayModel xray) async {
+    try {
+      final response = await client.post(
+        api.uploadXRay,
+        data: FormData.fromMap({
+          'xrayImage': await MultipartFile.fromFile(xray.image.path),
+          'notes': xray.notes,
+        }),
+      );
+      return response.statusCode == 201;
+    } catch (e) {
+      return false;
+    }
+  }
+}

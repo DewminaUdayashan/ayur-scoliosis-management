@@ -37,4 +37,8 @@ class Api {
   String respondToAppointment(String id) => '$appointmentsPath/$id/respond';
   String get upcomingAppointments => '$appointmentsPath/upcoming';
   String get dates => '$appointmentsPath/dates';
+
+  /// XRay
+  String get xrayPath => '$_apiPath/xray';
+  String get uploadXRay => '$xrayPath/upload';
 }

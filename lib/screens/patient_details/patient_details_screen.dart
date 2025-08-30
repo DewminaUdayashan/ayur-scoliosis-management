@@ -1,12 +1,17 @@
+import 'dart:io';
+
 import 'package:ayur_scoliosis_management/core/extensions/date_time.dart';
 import 'package:ayur_scoliosis_management/providers/auth/auth.dart';
 import 'package:ayur_scoliosis_management/providers/patient/patient_details.dart';
+import 'package:ayur_scoliosis_management/providers/xray/xray.dart';
 import 'package:ayur_scoliosis_management/screens/patient_details/widgets/patient_profile_name.dart';
+import 'package:ayur_scoliosis_management/widgets/buttons/primary_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../core/constants/size.dart';
 import '../../core/extensions/size.dart';
@@ -23,6 +28,7 @@ class PatientDetailsScreen extends HookConsumerWidget {
   final String patientId;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isLoading = useState(false);
     final tabController = useTabController(initialLength: 3);
     final activeTab = useState(0);
     final patientAsync = ref.watch(patientDetailsProvider(patientId));
@@ -133,22 +139,27 @@ class PatientDetailsScreen extends HookConsumerWidget {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      // TODO: Implement upload functionality
-                    },
-                    icon: const Icon(Icons.add, size: 20),
-                    label: const Text('Upload'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
+                  SizedBox(width: 100),
+                  Expanded(
+                    child: PrimaryButton(
+                      backgroundColor: AppTheme.accent,
+                      label: 'Upload',
+                      isLoading: isLoading.value,
+                      onPressed: () async {
+                        isLoading.value = true;
+                        try {
+                          final picker = ImagePicker();
+                          final image = await picker.pickImage(
+                            source: ImageSource.gallery,
+                          );
+                          if (image == null) return;
+                          await ref
+                              .read(xRayProvider.notifier)
+                              .uploadXray(File(image.path));
+                        } finally {
+                          isLoading.value = false;
+                        }
+                      },
                     ),
                   ),
                 ],
