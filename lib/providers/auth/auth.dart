@@ -52,11 +52,14 @@ class Auth extends _$Auth {
   Future<void> signOut() async {
     // final service = ref.watch(authServiceProvider);
     // await service.signOut();
-    state = AsyncValue.data(AuthStatus.unauthenticated);
-    SecureStorageService.setTempToken = null;
-    SecureStorageService.instance.deleteAll();
     ref.invalidate(dioProvider);
+    SecureStorageService.setTempToken = null;
+    await SecureStorageService.instance.deleteAll();
+    await SecureStorageService.instance.delete(SecureStorageService.tokenKey);
+
     navigatorKey.currentContext?.pushReplacement(AppRouter.login);
+    state = AsyncValue.data(AuthStatus.unauthenticated);
+    ref.invalidateSelf();
   }
 
   Future<void> setNewPassword(String newPassword) async {

@@ -2,14 +2,10 @@ import 'package:ayur_scoliosis_management/providers/auth/auth.dart';
 import 'package:ayur_scoliosis_management/providers/profile/profile.dart';
 import 'package:ayur_scoliosis_management/widgets/profile_avatar.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../../../../../../core/app_router.dart';
 import '../../../../../../core/extensions/theme.dart';
 import '../../../../../../core/theme.dart';
-import '../../../../../../providers/dio/dio.dart';
-import '../../../../../../services/storage/secure_storage_service_impl.dart';
 import '../../../../../../widgets/default_app_bar.dart';
 
 class PractitionerAppBar extends HookConsumerWidget {
@@ -56,10 +52,7 @@ class PractitionerAppBar extends HookConsumerWidget {
           IconButton(
             onPressed: () async {
               ///TODO: Remove this test code
-              await SecureStorageService.instance.deleteAll();
-              ref.invalidate(dioProvider);
-              ref.invalidate(authProvider);
-              if (context.mounted) context.pushReplacement(AppRouter.login);
+              ref.read(authProvider.notifier).signOut();
             },
             icon: Badge.count(
               count: 2,

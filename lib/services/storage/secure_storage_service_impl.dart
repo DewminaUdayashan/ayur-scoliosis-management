@@ -24,13 +24,11 @@ class SecureStorageService extends SecureStorageServiceBase {
 
   @override
   Future<void> deleteAll() async {
-    // final all = await storage.readAll();
-    // for (final key in all.keys) {
-    //   if (key != SecureStorageService.deviceBoundDataKey) {
-    //     await storage.delete(key: key);
-    //   }
-    // }
-    await storage.deleteAll();
+    await storage.deleteAll(
+      iOptions: IOSOptions(
+        accessibility: KeychainAccessibility.unlocked_this_device,
+      ),
+    );
   }
 
   @override
@@ -39,6 +37,12 @@ class SecureStorageService extends SecureStorageServiceBase {
 
   @override
   Future<void> write(String key, String? value) async {
-    return await storage.write(key: key, value: value);
+    return await storage.write(
+      key: key,
+      value: value,
+      iOptions: IOSOptions(
+        accessibility: KeychainAccessibility.unlocked_this_device,
+      ),
+    );
   }
 }

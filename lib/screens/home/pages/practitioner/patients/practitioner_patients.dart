@@ -95,6 +95,75 @@ class PractitionerPatients extends HookConsumerWidget {
                         .toList()
                         .expand((x) => x)
                         .toList();
+
+                    if (patients.isEmpty) {
+                      // Empty state
+                      return SliverFillRemaining(
+                        hasScrollBody: false,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              CupertinoIcons.person_2,
+                              size: 80,
+                              color: Colors.grey[400],
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'No Patients Yet',
+                              style: context.textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              searchQuery.value?.isNotEmpty == true
+                                  ? 'No patients found matching "${searchQuery.value}"'
+                                  : 'Start by inviting your first patient',
+                              style: context.textTheme.bodyMedium?.copyWith(
+                                color: Colors.grey[600],
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 24),
+                            if (searchQuery.value?.isEmpty ?? true)
+                              ElevatedButton.icon(
+                                onPressed: () {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    backgroundColor: Colors.transparent,
+                                    builder: (context) {
+                                      return Container(
+                                        decoration: const BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(24.0),
+                                            topRight: Radius.circular(24.0),
+                                          ),
+                                        ),
+                                        child: const InvitePatientSheet(),
+                                      );
+                                    },
+                                  );
+                                },
+                                icon: const Icon(CupertinoIcons.add),
+                                label: const Text('Invite Patient'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppTheme.accent,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 24,
+                                    vertical: 12,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      );
+                    }
+
                     return SliverList.builder(
                       itemCount: patients.length,
                       itemBuilder: (context, index) {
