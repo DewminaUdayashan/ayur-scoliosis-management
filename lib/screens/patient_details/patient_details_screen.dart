@@ -17,6 +17,7 @@ import '../../core/constants/size.dart';
 import '../../core/extensions/size.dart';
 import '../../core/extensions/widgets.dart';
 import '../../core/theme.dart';
+import '../../providers/profile/profile.dart';
 import '../../widgets/patient_profile_avatar.dart';
 import '../../widgets/sliver_sized_box.dart';
 import 'widgets/patient_documents_tab.dart';
@@ -28,6 +29,8 @@ class PatientDetailsScreen extends HookConsumerWidget {
   final String patientId;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final profile = ref.watch(profileProvider).valueOrNull;
+
     final isLoading = useState(false);
     final tabController = useTabController(initialLength: 3);
     final activeTab = useState(0);
@@ -140,33 +143,34 @@ class PatientDetailsScreen extends HookConsumerWidget {
                     ),
                   ),
                   SizedBox(width: 100),
-                  Expanded(
-                    child: PrimaryButton(
-                      backgroundColor: AppTheme.accent,
-                      label: 'Upload',
-                      isLoading: isLoading.value,
-                      onPressed: () async {
-                        isLoading.value = true;
-                        try {
-                          final picker = ImagePicker();
-                          final image = await picker.pickImage(
-                            source: ImageSource.gallery,
-                          );
-                          if (image == null) return;
-                          await ref
-                              .read(xRayProvider.notifier)
-                              .uploadXray(File(image.path));
-                        } finally {
-                          isLoading.value = false;
-                        }
-                      },
+                  if (profile?.isPatient == true)
+                    Expanded(
+                      child: PrimaryButton(
+                        backgroundColor: AppTheme.accent,
+                        label: 'Upload',
+                        isLoading: isLoading.value,
+                        onPressed: () async {
+                          isLoading.value = true;
+                          try {
+                            final picker = ImagePicker();
+                            final image = await picker.pickImage(
+                              source: ImageSource.gallery,
+                            );
+                            if (image == null) return;
+                            await ref
+                                .read(xRayProvider().notifier)
+                                .uploadXray(File(image.path));
+                          } finally {
+                            isLoading.value = false;
+                          }
+                        },
+                      ),
                     ),
-                  ),
                 ],
               ),
             ).sliverToBoxAdapter,
             SliverSizedBox(height: 20),
-            PatientDocumentsTab(),
+            PatientDocumentsTab(patientId: patientId),
             SliverSizedBox(
               height: context.bottomPadding + 20,
             ), // Space at the bottom

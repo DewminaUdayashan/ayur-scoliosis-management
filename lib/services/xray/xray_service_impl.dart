@@ -12,9 +12,12 @@ class XRayServiceImpl extends XRayService {
   final Dio client;
 
   @override
-  Future<Paginated<Xray>> getXrays() async {
+  Future<Paginated<Xray>> getXrays({String? patientId}) async {
     try {
-      final response = await client.get(api.xrayPath);
+      final response = await client.get(
+        api.xrayPath,
+        queryParameters: patientId != null ? {'patientId': patientId} : null,
+      );
       if (response.statusCode == 200) {
         return Paginated<Xray>.fromJson(
           response.data,
@@ -38,6 +41,34 @@ class XRayServiceImpl extends XRayService {
         }),
       );
       return response.statusCode == 201;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> validateXray(XRayModel xray) async {
+    try {
+      final dio = Dio();
+      dio.options.baseUrl = api.classifyImageType;
+      dio.options.headers = {'Content-Type': 'multipart/form-data'};
+      final response = await dio.post(
+        api.classifyImageType,
+        data: FormData.fromMap({
+          'file': await MultipartFile.fromFile(xray.image.path),
+        }),
+      );
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data is Map<String, dynamic> &&
+            data['predicted_class'] == 'spinal_xray') {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
     } catch (e) {
       return false;
     }

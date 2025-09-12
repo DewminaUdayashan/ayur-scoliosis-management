@@ -8,6 +8,10 @@ class Api {
     return 'http://192.168.1.104:3000'; // Default to localhost for development
   }
 
+  static String get classifierBaseUrl {
+    return 'http://localhost:8000';
+  }
+
   static final _apiPath = '/';
 
   /// Auth endpoints
@@ -41,4 +45,6 @@ class Api {
   /// XRay
   String get xrayPath => '$_apiPath/xray';
   String get uploadXRay => '$xrayPath/upload';
+
+  String get classifyImageType => '$classifierBaseUrl/classify_image_type';
 }

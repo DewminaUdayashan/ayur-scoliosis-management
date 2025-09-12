@@ -1,15 +1,25 @@
+import 'package:ayur_scoliosis_management/core/app_router.dart';
 import 'package:ayur_scoliosis_management/core/utils/api.dart';
+import 'package:ayur_scoliosis_management/providers/profile/profile.dart';
 import 'package:ayur_scoliosis_management/providers/xray/xray.dart';
 import 'package:ayur_scoliosis_management/widgets/sliver_sized_box.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class PatientDocumentsTab extends HookConsumerWidget {
-  const PatientDocumentsTab({super.key});
+  const PatientDocumentsTab({super.key, required this.patientId});
+  final String patientId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final xRaysAsync = ref.watch(xRayProvider);
+    final profile = ref.watch(profileProvider).valueOrNull;
+
+    final xRaysAsync = ref.watch(
+      xRayProvider(
+        patientId: profile?.isPractitioner == true ? patientId : null,
+      ),
+    );
 
     return xRaysAsync.when(
       data: (data) {
@@ -31,13 +41,19 @@ class PatientDocumentsTab extends HookConsumerWidget {
           itemBuilder: (context, index) {
             final xRay = xRays[index];
 
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12.0),
-                child: Image.network(
-                  Api.baseUrl + xRay.imageUrl,
-                  fit: BoxFit.cover,
+            return InkWell(
+              onTap: () => context.push(
+                AppRouter.measurementTool,
+                extra: {'imageUrl': Api.baseUrl + xRay.imageUrl},
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12.0),
+                  child: Image.network(
+                    Api.baseUrl + xRay.imageUrl,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
             );

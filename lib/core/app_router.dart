@@ -1,6 +1,7 @@
 import 'package:ayur_scoliosis_management/screens/appointment_details/appointment_details_screen.dart';
 import 'package:ayur_scoliosis_management/screens/auth/new_password_screen.dart';
 import 'package:ayur_scoliosis_management/screens/auth/registration_screen.dart';
+import 'package:ayur_scoliosis_management/screens/measurement/measurement_tool.dart';
 import 'package:flutter/material.dart' show NavigatorState, GlobalKey;
 import 'package:go_router/go_router.dart';
 
@@ -29,6 +30,8 @@ class AppRouter {
   static String appointmentDetails(String id) =>
       '$home/appointment-details/$id';
   static const _appointmentDetailsPath = 'appointment-details/:id';
+
+  static const measurementTool = '/measurement-tool';
 
   static final routes = GoRouter(
     initialLocation: login,
@@ -87,6 +90,19 @@ class AppRouter {
             },
           ),
         ],
+      ),
+      GoRoute(
+        path: measurementTool,
+        builder: (context, state) {
+          final imageUrl = (state.extra as Map)['imageUrl'] as String;
+          return CobbAngleToolScreen(
+            imageUrl: imageUrl,
+            initialMeasurement: null,
+            onSave: (measurement) {
+              // Handle the saved measurement
+            },
+          );
+        },
       ),
     ],
   );
