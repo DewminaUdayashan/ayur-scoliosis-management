@@ -97,10 +97,10 @@ class AppRouter {
           final imageUrl = (state.extra as Map)['imageUrl'] as String;
           return CobbAngleToolScreen(
             imageUrl: imageUrl,
-            initialMeasurement: null,
-            onSave: (measurement) {
-              // Handle the saved measurement
-            },
+            // initialMeasurement: null,
+            // onSave: (measurement) {
+            //   // Handle the saved measurement
+            // },
           );
         },
       ),
