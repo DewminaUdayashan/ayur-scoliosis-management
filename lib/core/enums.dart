@@ -44,30 +44,36 @@ enum AppointmentStatus {
 
 enum EventType {
   @JsonValue('AppointmentCompleted')
-  appointmentCompleted,
+  appointmentCompleted('Appointment Completed'),
   @JsonValue('XRayUpload')
-  xRayUpload,
+  xRayUpload('X-Ray Uploaded'),
   @JsonValue('AIClassification')
-  aiClassification,
+  aiClassification('AI Classification'),
   @JsonValue('CobbAngleMeasurement')
-  cobbAngleMeasurement,
+  cobbAngleMeasurement('Cobb Angle Measurement'),
   @JsonValue('SessionNote')
-  sessionNote,
+  sessionNote('Session Note');
+
+  const EventType(this.value);
+  final String value;
 }
 
 enum AIClassificationType {
   @JsonValue('NoScoliosisDetected')
-  noScoliosisDetected,
+  noScoliosisDetected('No Scoliosis Detected'),
   @JsonValue('ScoliosisCCurve')
-  scoliosisCCurve,
+  scoliosisCCurve('Scoliosis C Curve'),
   @JsonValue('ScoliosisSCurve')
-  scoliosisSCurve,
+  scoliosisSCurve('Scoliosis S Curve'),
   @JsonValue('NotASpinalXray')
-  notASpinalXray,
+  notASpinalXray('Not A Spinal X-ray'),
   @JsonValue('NoXrayDetected')
-  noXrayDetected,
+  noXrayDetected('No X-ray Detected'),
   @JsonValue('AnalysisFailed')
-  analysisFailed,
+  analysisFailed('Analysis Failed');
+
+  const AIClassificationType(this.value);
+  final String value;
 }
 
 enum UserRole {

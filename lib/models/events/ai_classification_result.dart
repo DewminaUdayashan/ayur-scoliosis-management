@@ -10,15 +10,15 @@ class AIClassificationResult extends Equatable {
   final String id;
   final String patientEventId;
   final AIClassificationType classificationResult;
-  final double confidenceScore;
-  final String notes;
+  final String confidenceScore;
+  final String? notes;
 
   const AIClassificationResult({
     required this.id,
     required this.patientEventId,
     required this.classificationResult,
     required this.confidenceScore,
-    required this.notes,
+    this.notes,
   });
 
   factory AIClassificationResult.fromJson(Map<String, dynamic> json) =>
