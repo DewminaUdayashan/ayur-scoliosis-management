@@ -1,5 +1,7 @@
 import 'package:ayur_scoliosis_management/core/extensions/dio.dart';
 import 'package:ayur_scoliosis_management/core/utils/api.dart';
+import 'package:ayur_scoliosis_management/core/utils/snacks.dart';
+import 'package:ayur_scoliosis_management/models/xray/measurement.dart';
 import 'package:ayur_scoliosis_management/models/xray/xray.dart';
 import 'package:ayur_scoliosis_management/services/xray/xray_service.dart';
 import 'package:dio/dio.dart';
@@ -71,6 +73,46 @@ class XRayServiceImpl extends XRayService {
       }
     } catch (e) {
       return false;
+    }
+  }
+
+  @override
+  Future<bool> measureXray(
+    String xrayId,
+    List<Measurement> measurements,
+  ) async {
+    try {
+      final response = await client.post(
+        api.measure,
+        data: {
+          'xrayImageId': xrayId,
+          'measurements': measurements.map((m) => m.toMap()).toList(),
+        },
+      );
+      return response.statusCode == 201;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  @override
+  Future<List<Measurement>> getMeasurement(String xrayId) async {
+    try {
+      final response = await client.get(api.getMeasurement(xrayId));
+      if (response.statusCode == 200) {
+        final measurements =
+            response.data['data']['measurements'] as List<dynamic>;
+        return measurements
+            .map((m) => Measurement.fromMap(m as Map<String, dynamic>))
+            .toList();
+      } else {
+        throw Exception('Failed to load measurements');
+      }
+    } on DioException catch (e) {
+      throw e.processException();
+    } catch (e) {
+      showErrorSnack(e.toString());
+      rethrow;
     }
   }
 }

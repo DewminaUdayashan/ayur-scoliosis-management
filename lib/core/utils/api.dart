@@ -5,7 +5,7 @@ class Api {
 
   // For development on different platforms
   static String get baseUrl {
-    return 'http://192.168.1.104:3000'; // Default to localhost for development
+    return 'http://localhost:3000'; // Default to localhost for development
   }
 
   static String get classifierBaseUrl {
@@ -45,6 +45,11 @@ class Api {
   /// XRay
   String get xrayPath => '$_apiPath/xray';
   String get uploadXRay => '$xrayPath/upload';
+  String get measure => '$xrayPath/measurements';
+  String getMeasurement(String xrayId) => '$measure/$xrayId';
+
+  /// Event endpoints
+  String get eventsPath => '$_apiPath/patient-event';
 
   String get classifyImageType => '$classifierBaseUrl/classify_image_type';
 }

@@ -15,8 +15,8 @@ AIClassificationResult _$AIClassificationResultFromJson(
     _$AIClassificationTypeEnumMap,
     json['classificationResult'],
   ),
-  confidenceScore: (json['confidenceScore'] as num).toDouble(),
-  notes: json['notes'] as String,
+  confidenceScore: json['confidenceScore'] as String,
+  notes: json['notes'] as String?,
 );
 
 Map<String, dynamic> _$AIClassificationResultToJson(

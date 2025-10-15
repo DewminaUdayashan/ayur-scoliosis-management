@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'xray.dart';
+part of 'events.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$xRayHash() => r'b8863194f9b3d8f245577b2e3fa5cb53bbface2a';
+String _$eventsHash() => r'35c28c4d76ae91141047295746e372716443edda';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,30 +29,23 @@ class _SystemHash {
   }
 }
 
-abstract class _$XRay
-    extends BuildlessAutoDisposeAsyncNotifier<List<Paginated<xray.Xray>>> {
-  late final String? patientId;
+/// See also [events].
+@ProviderFor(events)
+const eventsProvider = EventsFamily();
 
-  FutureOr<List<Paginated<xray.Xray>>> build({String? patientId});
-}
+/// See also [events].
+class EventsFamily extends Family<AsyncValue<List<PatientEvent>>> {
+  /// See also [events].
+  const EventsFamily();
 
-/// See also [XRay].
-@ProviderFor(XRay)
-const xRayProvider = XRayFamily();
-
-/// See also [XRay].
-class XRayFamily extends Family<AsyncValue<List<Paginated<xray.Xray>>>> {
-  /// See also [XRay].
-  const XRayFamily();
-
-  /// See also [XRay].
-  XRayProvider call({String? patientId}) {
-    return XRayProvider(patientId: patientId);
+  /// See also [events].
+  EventsProvider call(String? patientId) {
+    return EventsProvider(patientId);
   }
 
   @override
-  XRayProvider getProviderOverride(covariant XRayProvider provider) {
-    return call(patientId: provider.patientId);
+  EventsProvider getProviderOverride(covariant EventsProvider provider) {
+    return call(provider.patientId);
   }
 
   static const Iterable<ProviderOrFamily>? _dependencies = null;
@@ -67,28 +60,26 @@ class XRayFamily extends Family<AsyncValue<List<Paginated<xray.Xray>>>> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'xRayProvider';
+  String? get name => r'eventsProvider';
 }
 
-/// See also [XRay].
-class XRayProvider
-    extends
-        AutoDisposeAsyncNotifierProviderImpl<XRay, List<Paginated<xray.Xray>>> {
-  /// See also [XRay].
-  XRayProvider({String? patientId})
+/// See also [events].
+class EventsProvider extends AutoDisposeFutureProvider<List<PatientEvent>> {
+  /// See also [events].
+  EventsProvider(String? patientId)
     : this._internal(
-        () => XRay()..patientId = patientId,
-        from: xRayProvider,
-        name: r'xRayProvider',
+        (ref) => events(ref as EventsRef, patientId),
+        from: eventsProvider,
+        name: r'eventsProvider',
         debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
             ? null
-            : _$xRayHash,
-        dependencies: XRayFamily._dependencies,
-        allTransitiveDependencies: XRayFamily._allTransitiveDependencies,
+            : _$eventsHash,
+        dependencies: EventsFamily._dependencies,
+        allTransitiveDependencies: EventsFamily._allTransitiveDependencies,
         patientId: patientId,
       );
 
-  XRayProvider._internal(
+  EventsProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
@@ -101,18 +92,13 @@ class XRayProvider
   final String? patientId;
 
   @override
-  FutureOr<List<Paginated<xray.Xray>>> runNotifierBuild(
-    covariant XRay notifier,
+  Override overrideWith(
+    FutureOr<List<PatientEvent>> Function(EventsRef provider) create,
   ) {
-    return notifier.build(patientId: patientId);
-  }
-
-  @override
-  Override overrideWith(XRay Function() create) {
     return ProviderOverride(
       origin: this,
-      override: XRayProvider._internal(
-        () => create()..patientId = patientId,
+      override: EventsProvider._internal(
+        (ref) => create(ref as EventsRef),
         from: from,
         name: null,
         dependencies: null,
@@ -124,14 +110,13 @@ class XRayProvider
   }
 
   @override
-  AutoDisposeAsyncNotifierProviderElement<XRay, List<Paginated<xray.Xray>>>
-  createElement() {
-    return _XRayProviderElement(this);
+  AutoDisposeFutureProviderElement<List<PatientEvent>> createElement() {
+    return _EventsProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is XRayProvider && other.patientId == patientId;
+    return other is EventsProvider && other.patientId == patientId;
   }
 
   @override
@@ -145,23 +130,18 @@ class XRayProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin XRayRef
-    on AutoDisposeAsyncNotifierProviderRef<List<Paginated<xray.Xray>>> {
+mixin EventsRef on AutoDisposeFutureProviderRef<List<PatientEvent>> {
   /// The parameter `patientId` of this provider.
   String? get patientId;
 }
 
-class _XRayProviderElement
-    extends
-        AutoDisposeAsyncNotifierProviderElement<
-          XRay,
-          List<Paginated<xray.Xray>>
-        >
-    with XRayRef {
-  _XRayProviderElement(super.provider);
+class _EventsProviderElement
+    extends AutoDisposeFutureProviderElement<List<PatientEvent>>
+    with EventsRef {
+  _EventsProviderElement(super.provider);
 
   @override
-  String? get patientId => (origin as XRayProvider).patientId;
+  String? get patientId => (origin as EventsProvider).patientId;
 }
 
 // ignore_for_file: type=lint

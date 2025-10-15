@@ -1,3 +1,5 @@
+import 'package:ayur_scoliosis_management/models/events/ai_classification_result.dart';
+import 'package:ayur_scoliosis_management/models/events/xray_image.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -15,6 +17,8 @@ class PatientEvent extends Equatable {
     required this.eventType,
     required this.eventDateTime,
     required this.isSharedWithPatient,
+    this.aiClassificationResult,
+    this.xrayImages,
   });
   final String id;
   final String patientId;
@@ -23,6 +27,8 @@ class PatientEvent extends Equatable {
   final EventType eventType;
   final DateTime eventDateTime;
   final bool isSharedWithPatient;
+  final List<XRayImage>? xrayImages;
+  final AIClassificationResult? aiClassificationResult;
 
   factory PatientEvent.fromJson(Map<String, dynamic> json) =>
       _$PatientEventFromJson(json);

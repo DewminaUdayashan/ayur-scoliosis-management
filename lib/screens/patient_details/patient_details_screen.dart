@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:ayur_scoliosis_management/core/extensions/date_time.dart';
+import 'package:ayur_scoliosis_management/core/extensions/theme.dart';
 import 'package:ayur_scoliosis_management/providers/auth/auth.dart';
 import 'package:ayur_scoliosis_management/providers/patient/patient_details.dart';
 import 'package:ayur_scoliosis_management/providers/xray/xray.dart';
