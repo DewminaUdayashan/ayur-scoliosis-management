@@ -1,10 +1,12 @@
 import 'package:ayur_scoliosis_management/screens/appointment_details/appointment_details_screen.dart';
 import 'package:ayur_scoliosis_management/screens/auth/new_password_screen.dart';
 import 'package:ayur_scoliosis_management/screens/auth/registration_screen.dart';
-import 'package:ayur_scoliosis_management/screens/measurement/measurement_tool.dart';
+import 'package:ayur_scoliosis_management/screens/measurement/xray_measure_screen.dart';
 import 'package:flutter/material.dart' show NavigatorState, GlobalKey;
 import 'package:go_router/go_router.dart';
 
+import '../models/xray/measurement.dart';
+import '../models/xray/xray.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/otp_verification_screen.dart';
 import '../screens/home/home_screen.dart';
@@ -94,13 +96,19 @@ class AppRouter {
       GoRoute(
         path: measurementTool,
         builder: (context, state) {
-          final imageUrl = (state.extra as Map)['imageUrl'] as String;
-          return CobbAngleToolScreen(
-            imageUrl: imageUrl,
-            // initialMeasurement: null,
-            // onSave: (measurement) {
-            //   // Handle the saved measurement
-            // },
+          final xray = (state.extra as Map)['xray'] as Xray;
+          final initialMeasurements =
+              (state.extra as Map?)?['initialMeasurements']
+                  as List<Measurement>?;
+          final readOnly = (state.extra as Map?)?['readOnly'] as bool? ?? true;
+          final onSaved =
+              (state.extra as Map?)?['onSaved']
+                  as void Function(List<Measurement>)?;
+          return XrayMeasureScreen(
+            xray: xray,
+            initialMeasurements: initialMeasurements,
+            readOnly: readOnly,
+            onSaved: onSaved,
           );
         },
       ),

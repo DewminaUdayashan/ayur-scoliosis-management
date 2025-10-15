@@ -45,6 +45,8 @@ class Api {
   /// XRay
   String get xrayPath => '$_apiPath/xray';
   String get uploadXRay => '$xrayPath/upload';
+  String get measure => '$xrayPath/measurements';
+  String getMeasurement(String xrayId) => '$measure/$xrayId';
 
   /// Event endpoints
   String get eventsPath => '$_apiPath/patient-event';

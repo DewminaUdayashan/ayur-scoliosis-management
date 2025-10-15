@@ -40,11 +40,10 @@ class PatientDocumentsTab extends HookConsumerWidget {
           itemCount: xRays.length,
           itemBuilder: (context, index) {
             final xRay = xRays[index];
-
             return InkWell(
               onTap: () => context.push(
                 AppRouter.measurementTool,
-                extra: {'imageUrl': Api.baseUrl + xRay.imageUrl},
+                extra: {'xray': xRay, 'readOnly': profile?.isPatient},
               ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),

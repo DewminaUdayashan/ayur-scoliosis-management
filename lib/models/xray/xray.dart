@@ -6,7 +6,8 @@ part 'xray.g.dart';
 
 @JsonSerializable()
 class Xray {
-  Xray({required this.imageUrl, required this.notes});
+  Xray({required this.id, required this.imageUrl, required this.notes});
+  final String id;
   final String imageUrl;
   final String? notes;
 
