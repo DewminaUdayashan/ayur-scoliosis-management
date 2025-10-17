@@ -1,6 +1,9 @@
+import 'package:ayur_scoliosis_management/core/app_router.dart';
 import 'package:ayur_scoliosis_management/core/theme.dart';
+import 'package:ayur_scoliosis_management/core/utils/api.dart';
 import 'package:ayur_scoliosis_management/models/appointment/appointment_respond.dart';
 import 'package:ayur_scoliosis_management/providers/profile/profile.dart';
+import 'package:ayur_scoliosis_management/services/video_call/video_call_service.dart';
 import 'package:ayur_scoliosis_management/widgets/app_text_field.dart';
 import 'package:ayur_scoliosis_management/widgets/buttons/primary_button.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +13,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../core/enums.dart';
 import '../../../providers/appointment/appointment_details.dart';
+import '../../../providers/dio/dio.dart';
 import '../../../widgets/skeleton.dart';
 
 class AppointmentActionButton extends HookConsumerWidget {
@@ -151,7 +155,71 @@ class AppointmentActionButton extends HookConsumerWidget {
           }
           return SizedBox.shrink();
         }
+
+        // Helper function to check if appointment time is near (within 15 minutes before or anytime after)
+        bool canJoinCall() {
+          final now = DateTime.now();
+          final appointmentTime = appointment.appointmentDateTime.toLocal();
+          final difference = appointmentTime.difference(now);
+          // Allow joining 15 minutes before the appointment or anytime after
+          return difference.inMinutes <= 15;
+        }
+
         if (appointment.status == AppointmentStatus.scheduled) {
+          // For remote appointments, show video call button
+          if (appointment.type == AppointmentType.remote) {
+            final canJoin = canJoinCall();
+            return PrimaryButton(
+              label: canJoin
+                  ? 'Join Video Call'
+                  : 'Video Call (Not Yet Available)',
+              isLoading: isLoading.value,
+              backgroundColor: canJoin ? AppTheme.primary : Colors.grey,
+              onPressed: canJoin
+                  ? () async {
+                      isLoading.value = true;
+                      try {
+                        // Create or get the video call room
+                        final dio = ref.read(dioProvider);
+                        final videoCallService = VideoCallServiceImpl(
+                          api: Api(),
+                          client: dio,
+                        );
+
+                        try {
+                          // Try to get existing room
+                          await videoCallService.getRoomByAppointment(
+                            appointment.id,
+                          );
+                        } catch (e) {
+                          // If room doesn't exist, create it
+                          await videoCallService.createRoomForAppointment(
+                            appointment.id,
+                          );
+                        }
+
+                        // Navigate to video call screen
+                        if (context.mounted) {
+                          context.push(AppRouter.videoCall(appointment.id));
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Failed to join video call: $e'),
+                              backgroundColor: AppTheme.error,
+                            ),
+                          );
+                        }
+                      } finally {
+                        isLoading.value = false;
+                      }
+                    }
+                  : null,
+            );
+          }
+
+          // For physical appointments
           return PrimaryButton(
             label: 'Start Session',
             isLoading: isLoading.value,
