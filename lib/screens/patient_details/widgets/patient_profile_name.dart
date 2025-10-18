@@ -12,11 +12,14 @@ class PatientProfileName extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final patientAsync = ref.watch(patientDetailsProvider(id));
     return patientAsync.when(
-      data: (patient) => Text(
-        patient.fullName,
-        style: context.textTheme.titleMedium?.copyWith(
-          fontWeight: FontWeight.bold,
-          fontSize: 14,
+      data: (patient) => Padding(
+        padding: const EdgeInsets.only(left: 70),
+        child: Text(
+          patient.fullName,
+          style: context.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+          ),
         ),
       ),
       error: (error, _) => Text(
