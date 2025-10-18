@@ -15,7 +15,8 @@ class PatientSchedule extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedDay = useState(DateTime.now());
+    final now = useMemoized(() => DateTime.now());
+    final selectedDay = useState(DateTime(now.year, now.month, now.day));
     final appointmentsAsync = ref.watch(
       appointmentsProvider(
         startDate: selectedDay.value,
