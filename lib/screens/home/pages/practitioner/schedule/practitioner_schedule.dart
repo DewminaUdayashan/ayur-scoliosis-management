@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:table_calendar/table_calendar.dart';
 
 import '../../../../../core/extensions/theme.dart';
 import '../../../../../core/theme.dart';
@@ -14,29 +13,13 @@ import '../../../../../widgets/skeleton.dart';
 import '../../../../../widgets/sliver_sized_box.dart';
 import 'widgets/add_appointment_sheet.dart';
 
-/// Data model for a single appointment.
-class _Appointment {
-  final String title;
-  final String time;
-  final String patientName;
-  final String avatarUrl;
-  final Color color;
-
-  _Appointment({
-    required this.title,
-    required this.time,
-    required this.patientName,
-    required this.avatarUrl,
-    required this.color,
-  });
-}
-
 class PractitionerSchedule extends HookConsumerWidget {
   const PractitionerSchedule({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedDay = useState(DateTime.now());
+    final now = useMemoized(() => DateTime.now());
+    final selectedDay = useState(DateTime(now.year, now.month, now.day));
     final appointmentsAsync = ref.watch(
       appointmentsProvider(
         startDate: selectedDay.value,
@@ -167,150 +150,6 @@ class PractitionerSchedule extends HookConsumerWidget {
               backgroundColor: AppTheme.accent,
               child: const Icon(CupertinoIcons.add, color: Colors.white),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Builds the calendar card widget.
-  Widget _buildCalendarCard(
-    BuildContext context,
-    ValueNotifier<DateTime> focusedDay,
-    ValueNotifier<DateTime> selectedDay,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(12.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withAlpha(10),
-            spreadRadius: 2,
-            blurRadius: 10,
-          ),
-        ],
-      ),
-      child: TableCalendar(
-        firstDay: DateTime.utc(2020, 1, 1),
-        lastDay: DateTime.utc(2030, 12, 31),
-        focusedDay: focusedDay.value,
-        calendarFormat: CalendarFormat.month,
-        selectedDayPredicate: (day) => isSameDay(selectedDay.value, day),
-        onDaySelected: (newSelectedDay, newFocusedDay) {
-          selectedDay.value = newSelectedDay;
-          focusedDay.value = newFocusedDay;
-        },
-        onPageChanged: (newFocusedDay) {
-          focusedDay.value = newFocusedDay;
-        },
-        // --- UI CUSTOMIZATION ---
-        headerStyle: HeaderStyle(
-          titleCentered: true,
-          formatButtonVisible: false,
-          titleTextStyle: context.textTheme.titleMedium!.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-          leftChevronIcon: const Icon(
-            CupertinoIcons.chevron_left,
-            color: Colors.grey,
-          ),
-          rightChevronIcon: const Icon(
-            CupertinoIcons.chevron_right,
-            color: Colors.grey,
-          ),
-        ),
-        calendarStyle: CalendarStyle(
-          // Style for the selected day
-          selectedDecoration: BoxDecoration(
-            color: AppTheme.accent,
-            shape: BoxShape.circle,
-          ),
-          // Style for today
-          todayDecoration: BoxDecoration(
-            color: AppTheme.accent.withAlpha(30),
-            shape: BoxShape.circle,
-          ),
-          // Style for markers (dots under the date)
-          markerDecoration: BoxDecoration(
-            color: AppTheme.accent.withAlpha(70),
-            shape: BoxShape.circle,
-          ),
-        ),
-        // Provides markers for days with events
-        eventLoader: (day) {
-          // In a real app, you would check if this day has appointments
-          if (day.day == 11 ||
-              day.day == 17 ||
-              day.day == 21 ||
-              day.day == 27 ||
-              day.day == 28) {
-            return ['event'];
-          }
-          return [];
-        },
-      ),
-    );
-  }
-}
-
-/// A card widget to display a single appointment.
-class _AppointmentCard extends StatelessWidget {
-  const _AppointmentCard({required this.appointment});
-  final _Appointment appointment;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withAlpha(8),
-            spreadRadius: 1,
-            blurRadius: 8,
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Colored vertical bar
-          Container(
-            width: 5,
-            height: 50,
-            decoration: BoxDecoration(
-              color: appointment.color,
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          const SizedBox(width: 16),
-          // Appointment details
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                appointment.title,
-                style: context.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                '${appointment.time} - ${appointment.patientName}',
-                style: context.textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey.shade600,
-                ),
-              ),
-            ],
-          ),
-          const Spacer(),
-          // Patient avatar
-          CircleAvatar(
-            radius: 24,
-            backgroundImage: AssetImage(appointment.avatarUrl),
           ),
         ],
       ),
