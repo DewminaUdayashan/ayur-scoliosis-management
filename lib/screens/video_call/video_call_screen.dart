@@ -1,197 +1,261 @@
 import 'package:ayur_scoliosis_management/providers/profile/profile.dart';
+import 'package:ayur_scoliosis_management/providers/video_call/is_in_call.dart';
 import 'package:ayur_scoliosis_management/providers/video_call/video_call.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class VideoCallScreen extends ConsumerStatefulWidget {
+class VideoCallScreen extends HookConsumerWidget {
   final String appointmentId;
 
   const VideoCallScreen({super.key, required this.appointmentId});
 
   @override
-  ConsumerState<VideoCallScreen> createState() => _VideoCallScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Initialize video renderers
+    final localRenderer = useMemoized(() => RTCVideoRenderer());
+    final remoteRenderer = useMemoized(() => RTCVideoRenderer());
+    final isInitialized = useState(false);
 
-class _VideoCallScreenState extends ConsumerState<VideoCallScreen>
-    with SingleTickerProviderStateMixin {
-  final RTCVideoRenderer _localRenderer = RTCVideoRenderer();
-  final RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
-  bool _isInitialized = false;
+    // State for draggable local video preview
+    final localVideoPosition = useState<Offset?>(null);
 
-  // For draggable local video preview - start at bottom right
-  Offset? _localVideoPosition;
+    // State for auto-hiding UI controls
+    final showControls = useState(true);
 
-  // For auto-hiding UI controls
-  bool _showControls = true;
-  late AnimationController _controlsAnimationController;
-  late Animation<double> _controlsAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _initRenderers();
-
-    // Setup animation controller for controls
-    _controlsAnimationController = AnimationController(
-      vsync: this,
+    // Animation controller for controls
+    final controlsAnimationController = useAnimationController(
       duration: const Duration(milliseconds: 300),
     );
-    _controlsAnimation = CurvedAnimation(
-      parent: _controlsAnimationController,
-      curve: Curves.easeInOut,
+    final controlsAnimation = useMemoized(
+      () => CurvedAnimation(
+        parent: controlsAnimationController,
+        curve: Curves.easeInOut,
+      ),
+      [controlsAnimationController],
     );
 
-    // Show controls initially
-    _controlsAnimationController.forward();
+    useEffect(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(isInCallProvider.notifier).setInCall(true);
+      });
+      return () {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          ref.read(isInCallProvider.notifier).setInCall(false);
+        });
+      };
+    }, [controlsAnimationController]);
 
-    // Auto-hide controls after 3 seconds
-    _scheduleControlsAutoHide();
+    // Initialize renderers
+    useEffect(() {
+      Future<void> initRenderers() async {
+        await localRenderer.initialize();
+        await remoteRenderer.initialize();
+        isInitialized.value = true;
+      }
 
-    // Delay joining the call until after the widget tree is built
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _joinCall();
-      _setInitialLocalVideoPosition();
-    });
-  }
+      initRenderers();
 
-  void _setInitialLocalVideoPosition() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
-        if (renderBox != null) {
-          final size = renderBox.size;
-          // Position at bottom right, above the controls (100px from bottom)
-          setState(() {
-            _localVideoPosition = Offset(
+      // Cleanup
+      return () {
+        localRenderer.dispose();
+        remoteRenderer.dispose();
+      };
+    }, []);
+
+    // Join call on mount
+    useEffect(() {
+      Future<void> joinCall() async {
+        try {
+          await ref.read(videoCallProvider.notifier).joinCall(appointmentId);
+        } catch (e) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Failed to join call: $e'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
+      }
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        joinCall();
+      });
+
+      return null;
+    }, []);
+
+    // Set initial local video position
+    useEffect(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted) {
+          final renderBox = context.findRenderObject() as RenderBox?;
+          if (renderBox != null) {
+            final size = renderBox.size;
+            localVideoPosition.value = Offset(
               size.width - 120 - 20, // 20px from right edge
               size.height - 160 - 120, // 120px from bottom (above controls)
             );
-          });
+          }
+        }
+      });
+      return null;
+    }, []);
+
+    // Show controls initially and setup animation
+    useEffect(() {
+      controlsAnimationController.forward();
+      return null;
+    }, []);
+
+    // Auto-hide controls after 3 seconds
+    useEffect(() {
+      Future<void> scheduleAutoHide() async {
+        await Future.delayed(const Duration(seconds: 3));
+        if (context.mounted && showControls.value) {
+          showControls.value = false;
+          controlsAnimationController.reverse();
         }
       }
-    });
-  }
 
-  void _scheduleControlsAutoHide() {
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted && _showControls) {
-        _hideControls();
-      }
-    });
-  }
+      scheduleAutoHide();
+      return null;
+    }, [showControls.value]);
 
-  void _toggleControls() {
-    setState(() {
-      _showControls = !_showControls;
-      if (_showControls) {
-        _controlsAnimationController.forward();
-        _scheduleControlsAutoHide();
+    // Toggle controls function
+    void toggleControls() {
+      showControls.value = !showControls.value;
+      if (showControls.value) {
+        controlsAnimationController.forward();
       } else {
-        _controlsAnimationController.reverse();
-      }
-    });
-  }
-
-  void _hideControls() {
-    if (mounted) {
-      setState(() {
-        _showControls = false;
-        _controlsAnimationController.reverse();
-      });
-    }
-  }
-
-  Future<void> _initRenderers() async {
-    await _localRenderer.initialize();
-    await _remoteRenderer.initialize();
-    setState(() {
-      _isInitialized = true;
-    });
-  }
-
-  Future<void> _joinCall() async {
-    try {
-      await ref.read(videoCallProvider.notifier).joinCall(widget.appointmentId);
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to join call: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        controlsAnimationController.reverse();
       }
     }
-  }
 
-  @override
-  void dispose() {
-    _controlsAnimationController.dispose();
-    _localRenderer.dispose();
-    _remoteRenderer.dispose();
-    // Don't automatically leave the call - user must explicitly end it
-    // This allows them to navigate away and come back
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+    // Watch video call state
     final videoCallState = ref.watch(videoCallProvider);
 
     // Set streams to renderers
-    if (_isInitialized) {
-      if (videoCallState.localStream != null) {
-        _localRenderer.srcObject = videoCallState.localStream;
+    useEffect(
+      () {
+        if (isInitialized.value) {
+          if (videoCallState.localStream != null) {
+            localRenderer.srcObject = videoCallState.localStream;
+          }
+          if (videoCallState.remoteStream != null) {
+            remoteRenderer.srcObject = videoCallState.remoteStream;
+          }
+        }
+        return null;
+      },
+      [
+        isInitialized.value,
+        videoCallState.localStream,
+        videoCallState.remoteStream,
+      ],
+    );
+
+    // Helper function to get participant name
+    String getParticipantName(VideoCallState state) {
+      if (state.room?.appointment != null) {
+        final appointment = state.room!.appointment!;
+
+        // Get current user to determine which name to show
+        final currentUser = ref.read(profileProvider).valueOrNull;
+        if (currentUser == null) return 'Participant';
+
+        final currentUserId = currentUser.id;
+
+        // Get practitioner info
+        final practitioner =
+            appointment['practitioner'] as Map<String, dynamic>?;
+        final practitionerId = practitioner?['id'] as String?;
+        final practitionerFirstName = practitioner?['firstName'] ?? '';
+        final practitionerLastName = practitioner?['lastName'] ?? '';
+        final practitionerFullName =
+            'Dr. $practitionerFirstName $practitionerLastName'.trim();
+
+        // Get patient info
+        final patient = appointment['patient'] as Map<String, dynamic>?;
+        final patientId = patient?['id'] as String?;
+        final patientFirstName = patient?['firstName'] ?? '';
+        final patientLastName = patient?['lastName'] ?? '';
+        final patientFullName = '$patientFirstName $patientLastName'.trim();
+
+        // If current user is the practitioner, show patient's name
+        if (currentUserId == practitionerId) {
+          return patientFullName.isNotEmpty ? patientFullName : 'Patient';
+        }
+
+        // If current user is the patient, show practitioner's name
+        if (currentUserId == patientId) {
+          return practitionerFullName.isNotEmpty
+              ? practitionerFullName
+              : 'Practitioner';
+        }
+
+        // Fallback: try to determine from role
+        if (practitionerFullName.isNotEmpty) {
+          return practitionerFullName;
+        }
+        if (patientFullName.isNotEmpty) {
+          return patientFullName;
+        }
       }
-      if (videoCallState.remoteStream != null) {
-        _remoteRenderer.srcObject = videoCallState.remoteStream;
-      }
+      return 'Participant';
     }
 
     // Get participant name for placeholder
-    final participantName = _getParticipantName(videoCallState);
+    final participantName = getParticipantName(videoCallState);
 
     // Check if remote video is actually available
     // Use the remoteVideoEnabled state that comes from signaling
     final hasRemoteVideo =
         videoCallState.remoteStream != null &&
         videoCallState.callState == CallState.connected &&
-        videoCallState
-            .remoteVideoEnabled; // Use signaling state instead of track detection
+        videoCallState.remoteVideoEnabled;
 
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: GestureDetector(
-        onTap: _toggleControls,
-        behavior: HitTestBehavior.translucent,
-        child: Stack(
-          children: [
-            // Remote video (full screen) or placeholder with initials
-            // Show placeholder if no stream OR if connected but video is off
-            if (hasRemoteVideo)
-              SizedBox.expand(
-                child: RTCVideoView(
-                  _remoteRenderer,
-                  objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-                  placeholderBuilder: (context) =>
-                      _buildRemotePlaceholder(videoCallState, participantName),
-                ),
-              )
-            else
-              _buildRemotePlaceholder(videoCallState, participantName),
+    return PopScope(
+      onPopInvokedWithResult: (_, _) {
+        ref.read(isInCallProvider.notifier).setInCall(false);
+      },
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: GestureDetector(
+          onTap: toggleControls,
+          behavior: HitTestBehavior.translucent,
+          child: Stack(
+            children: [
+              // Remote video (full screen) or placeholder with initials
+              // Show placeholder if no stream OR if connected but video is off
+              if (hasRemoteVideo)
+                SizedBox.expand(
+                  child: RTCVideoView(
+                    remoteRenderer,
+                    objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                    placeholderBuilder: (context) => _buildRemotePlaceholder(
+                      videoCallState,
+                      participantName,
+                    ),
+                  ),
+                )
+              else
+                _buildRemotePlaceholder(videoCallState, participantName),
 
-            // Local video (small draggable overlay)
-            if (_localVideoPosition != null)
-              Positioned(
-                left: _localVideoPosition!.dx,
-                top: _localVideoPosition!.dy,
-                child: GestureDetector(
-                  onPanUpdate: (details) {
-                    setState(() {
-                      final newPosition = _localVideoPosition! + details.delta;
+              // Local video (small draggable overlay)
+              if (localVideoPosition.value != null)
+                Positioned(
+                  left: localVideoPosition.value!.dx,
+                  top: localVideoPosition.value!.dy,
+                  child: GestureDetector(
+                    onPanUpdate: (details) {
+                      final newPosition =
+                          localVideoPosition.value! + details.delta;
                       final RenderBox renderBox =
                           context.findRenderObject() as RenderBox;
                       final size = renderBox.size;
@@ -203,213 +267,223 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen>
                         size.height - 160,
                       );
 
-                      _localVideoPosition = Offset(newX, newY);
-                    });
-                  },
-                  child: _buildLocalVideoPreview(videoCallState),
-                ),
-              ),
-
-            // Top bar with room info (animated)
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: AnimatedBuilder(
-                animation: _controlsAnimation,
-                builder: (context, child) {
-                  return Transform.translate(
-                    offset: Offset(0, -80 * (1 - _controlsAnimation.value)),
-                    child: Opacity(
-                      opacity: _controlsAnimation.value,
-                      child: child,
-                    ),
-                  );
-                },
-                child: Container(
-                  padding: EdgeInsets.only(
-                    top: MediaQuery.of(context).padding.top + 16,
-                    left: 16,
-                    right: 16,
-                    bottom: 16,
-                  ),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [Colors.black.withAlpha(178), Colors.transparent],
+                      localVideoPosition.value = Offset(newX, newY);
+                    },
+                    child: _buildLocalVideoPreview(
+                      videoCallState,
+                      localRenderer,
+                      isInitialized.value,
                     ),
                   ),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        CupertinoIcons.videocam_fill,
-                        color: Colors.white,
-                        size: 24,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Video Call',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              participantName,
-                              style: const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
-              ),
-            ),
 
-            // Error message
-            if (videoCallState.callState == CallState.error)
+              // Top bar with room info (animated)
               Positioned(
-                top: 100,
-                left: 20,
-                right: 20,
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    videoCallState.error ?? 'An error occurred',
-                    style: const TextStyle(color: Colors.white),
-                    textAlign: TextAlign.center,
+                top: 0,
+                left: 0,
+                right: 0,
+                child: AnimatedBuilder(
+                  animation: controlsAnimation,
+                  builder: (context, child) {
+                    return Transform.translate(
+                      offset: Offset(0, -80 * (1 - controlsAnimation.value)),
+                      child: Opacity(
+                        opacity: controlsAnimation.value,
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).padding.top + 16,
+                      left: 16,
+                      right: 16,
+                      bottom: 16,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withAlpha(178),
+                          Colors.transparent,
+                        ],
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          CupertinoIcons.videocam_fill,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Video Call',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                participantName,
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
 
-            // Bottom control bar (animated)
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: AnimatedBuilder(
-                animation: _controlsAnimation,
-                builder: (context, child) {
-                  return Transform.translate(
-                    offset: Offset(0, 100 * (1 - _controlsAnimation.value)),
-                    child: Opacity(
-                      opacity: _controlsAnimation.value,
-                      child: child,
+              // Error message
+              if (videoCallState.callState == CallState.error)
+                Positioned(
+                  top: 100,
+                  left: 20,
+                  right: 20,
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                  );
-                },
-                child: Container(
-                  padding: EdgeInsets.only(
-                    top: 24,
-                    left: 24,
-                    right: 24,
-                    bottom: MediaQuery.of(context).padding.bottom + 24,
-                  ),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                      colors: [Colors.black.withAlpha(178), Colors.transparent],
+                    child: Text(
+                      videoCallState.error ?? 'An error occurred',
+                      style: const TextStyle(color: Colors.white),
+                      textAlign: TextAlign.center,
                     ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      // Toggle Audio
-                      _buildControlButton(
-                        icon: videoCallState.isAudioEnabled
-                            ? CupertinoIcons.mic_fill
-                            : CupertinoIcons.mic_slash_fill,
-                        label: 'Mic',
-                        onPressed: () {
-                          ref.read(videoCallProvider.notifier).toggleAudio();
-                        },
-                        isActive: videoCallState.isAudioEnabled,
-                      ),
+                ),
 
-                      // Toggle Video
-                      _buildControlButton(
-                        icon: videoCallState.isVideoEnabled
-                            ? Icons.videocam
-                            : Icons.videocam_off,
-                        label: 'Camera',
-                        onPressed: () {
-                          ref.read(videoCallProvider.notifier).toggleVideo();
-                        },
-                        isActive: videoCallState.isVideoEnabled,
+              // Bottom control bar (animated)
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: AnimatedBuilder(
+                  animation: controlsAnimation,
+                  builder: (context, child) {
+                    return Transform.translate(
+                      offset: Offset(0, 100 * (1 - controlsAnimation.value)),
+                      child: Opacity(
+                        opacity: controlsAnimation.value,
+                        child: child,
                       ),
-
-                      // Switch Camera
-                      _buildControlButton(
-                        icon: CupertinoIcons.camera_rotate,
-                        label: 'Flip',
-                        onPressed: videoCallState.isVideoEnabled
-                            ? () {
-                                ref
-                                    .read(videoCallProvider.notifier)
-                                    .switchCamera();
-                              }
-                            : () {}, // Disabled when camera is off
-                        isEnabled: videoCallState.isVideoEnabled,
+                    );
+                  },
+                  child: Container(
+                    padding: EdgeInsets.only(
+                      top: 24,
+                      left: 24,
+                      right: 24,
+                      bottom: MediaQuery.of(context).padding.bottom + 24,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                        colors: [
+                          Colors.black.withAlpha(178),
+                          Colors.transparent,
+                        ],
                       ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        // Toggle Audio
+                        _buildControlButton(
+                          icon: videoCallState.isAudioEnabled
+                              ? CupertinoIcons.mic_fill
+                              : CupertinoIcons.mic_slash_fill,
+                          label: 'Mic',
+                          onPressed: () {
+                            ref.read(videoCallProvider.notifier).toggleAudio();
+                          },
+                          isActive: videoCallState.isAudioEnabled,
+                        ),
 
-                      // Screen Share (if practitioner)
-                      // TODO: Check if user is practitioner
-                      _buildControlButton(
-                        icon: videoCallState.isScreenSharing
-                            ? CupertinoIcons.stop_circle
-                            : CupertinoIcons.device_desktop,
-                        label: videoCallState.isScreenSharing
-                            ? 'Stop'
-                            : 'Share',
-                        onPressed: () async {
-                          if (videoCallState.isScreenSharing) {
+                        // Toggle Video
+                        _buildControlButton(
+                          icon: videoCallState.isVideoEnabled
+                              ? Icons.videocam
+                              : Icons.videocam_off,
+                          label: 'Camera',
+                          onPressed: () {
+                            ref.read(videoCallProvider.notifier).toggleVideo();
+                          },
+                          isActive: videoCallState.isVideoEnabled,
+                        ),
+
+                        // Switch Camera
+                        _buildControlButton(
+                          icon: CupertinoIcons.camera_rotate,
+                          label: 'Flip',
+                          onPressed: videoCallState.isVideoEnabled
+                              ? () {
+                                  ref
+                                      .read(videoCallProvider.notifier)
+                                      .switchCamera();
+                                }
+                              : () {}, // Disabled when camera is off
+                          isEnabled: videoCallState.isVideoEnabled,
+                        ),
+
+                        // Screen Share (if practitioner)
+                        // TODO: Check if user is practitioner
+                        _buildControlButton(
+                          icon: videoCallState.isScreenSharing
+                              ? CupertinoIcons.stop_circle
+                              : CupertinoIcons.device_desktop,
+                          label: videoCallState.isScreenSharing
+                              ? 'Stop'
+                              : 'Share',
+                          onPressed: () async {
+                            if (videoCallState.isScreenSharing) {
+                              await ref
+                                  .read(videoCallProvider.notifier)
+                                  .stopScreenShare();
+                            } else {
+                              await ref
+                                  .read(videoCallProvider.notifier)
+                                  .startScreenShare();
+                            }
+                          },
+                          isActive: videoCallState.isScreenSharing,
+                        ),
+
+                        // End Call
+                        _buildControlButton(
+                          icon: CupertinoIcons.phone_down_fill,
+                          label: 'End',
+                          onPressed: () async {
                             await ref
                                 .read(videoCallProvider.notifier)
-                                .stopScreenShare();
-                          } else {
-                            await ref
-                                .read(videoCallProvider.notifier)
-                                .startScreenShare();
-                          }
-                        },
-                        isActive: videoCallState.isScreenSharing,
-                      ),
-
-                      // End Call
-                      _buildControlButton(
-                        icon: CupertinoIcons.phone_down_fill,
-                        label: 'End',
-                        onPressed: () async {
-                          await ref
-                              .read(videoCallProvider.notifier)
-                              .leaveCall();
-                          if (context.mounted) {
-                            context.pop();
-                          }
-                        },
-                        backgroundColor: Colors.red,
-                      ),
-                    ],
+                                .leaveCall();
+                            if (context.mounted) {
+                              context.pop();
+                            }
+                          },
+                          backgroundColor: Colors.red,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -476,54 +550,6 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen>
       case CallState.error:
         return 'Connection error';
     }
-  }
-
-  String _getParticipantName(VideoCallState state) {
-    if (state.room?.appointment != null) {
-      final appointment = state.room!.appointment!;
-
-      // Get current user to determine which name to show
-      final currentUser = ref.read(profileProvider).valueOrNull;
-      if (currentUser == null) return 'Participant';
-
-      final currentUserId = currentUser.id;
-
-      // Get practitioner info
-      final practitioner = appointment['practitioner'] as Map<String, dynamic>?;
-      final practitionerId = practitioner?['id'] as String?;
-      final practitionerFirstName = practitioner?['firstName'] ?? '';
-      final practitionerLastName = practitioner?['lastName'] ?? '';
-      final practitionerFullName =
-          'Dr. $practitionerFirstName $practitionerLastName'.trim();
-
-      // Get patient info
-      final patient = appointment['patient'] as Map<String, dynamic>?;
-      final patientId = patient?['id'] as String?;
-      final patientFirstName = patient?['firstName'] ?? '';
-      final patientLastName = patient?['lastName'] ?? '';
-      final patientFullName = '$patientFirstName $patientLastName'.trim();
-
-      // If current user is the practitioner, show patient's name
-      if (currentUserId == practitionerId) {
-        return patientFullName.isNotEmpty ? patientFullName : 'Patient';
-      }
-
-      // If current user is the patient, show practitioner's name
-      if (currentUserId == patientId) {
-        return practitionerFullName.isNotEmpty
-            ? practitionerFullName
-            : 'Practitioner';
-      }
-
-      // Fallback: try to determine from role
-      if (practitionerFullName.isNotEmpty) {
-        return practitionerFullName;
-      }
-      if (patientFullName.isNotEmpty) {
-        return patientFullName;
-      }
-    }
-    return 'Participant';
   }
 
   String _getInitials(String name) {
@@ -622,7 +648,9 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen>
   }
 
   Widget _buildLocalVideoPreview(
-    VideoCallState videoCallState, {
+    VideoCallState videoCallState,
+    RTCVideoRenderer localRenderer,
+    bool isInitialized, {
     bool isDragging = false,
   }) {
     const double width = 120;
@@ -652,9 +680,9 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen>
             // Show video if camera is on and stream exists
             if (videoCallState.isVideoEnabled &&
                 videoCallState.localStream != null &&
-                _isInitialized)
+                isInitialized)
               RTCVideoView(
-                _localRenderer,
+                localRenderer,
                 mirror: true,
                 objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
               )

@@ -3,7 +3,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../providers/page/active_page.dart';
 import '../../providers/page/page.dart';
-import '../../widgets/video_call_floating_indicator.dart';
 
 class HomeScreen extends HookConsumerWidget {
   const HomeScreen({super.key});
@@ -11,13 +10,7 @@ class HomeScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final pages = ref.watch(pageProvider);
     return Scaffold(
-      body: Stack(
-        children: [
-          pages[ref.watch(activePageProvider)].page,
-          // Floating indicator for active video calls
-          const VideoCallFloatingIndicator(),
-        ],
-      ),
+      body: pages[ref.watch(activePageProvider)].page,
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
         onTap: ref.read(activePageProvider.notifier).setActivePage,
