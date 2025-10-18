@@ -344,8 +344,8 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen>
                       // Toggle Video
                       _buildControlButton(
                         icon: videoCallState.isVideoEnabled
-                            ? CupertinoIcons.video_camera_solid
-                            : CupertinoIcons.video_camera_solid,
+                            ? Icons.videocam
+                            : Icons.videocam_off,
                         label: 'Camera',
                         onPressed: () {
                           ref.read(videoCallProvider.notifier).toggleVideo();
@@ -357,9 +357,14 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen>
                       _buildControlButton(
                         icon: CupertinoIcons.camera_rotate,
                         label: 'Flip',
-                        onPressed: () {
-                          ref.read(videoCallProvider.notifier).switchCamera();
-                        },
+                        onPressed: videoCallState.isVideoEnabled
+                            ? () {
+                                ref
+                                    .read(videoCallProvider.notifier)
+                                    .switchCamera();
+                              }
+                            : () {}, // Disabled when camera is off
+                        isEnabled: videoCallState.isVideoEnabled,
                       ),
 
                       // Screen Share (if practitioner)
@@ -415,6 +420,7 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen>
     required String label,
     required VoidCallback onPressed,
     bool isActive = true,
+    bool isEnabled = true, // New parameter to disable button
     Color? backgroundColor,
   }) {
     return Column(
@@ -424,19 +430,35 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen>
           decoration: BoxDecoration(
             color:
                 backgroundColor ??
-                (isActive ? Colors.white.withAlpha(51) : Colors.white24),
+                (isEnabled
+                    ? (isActive ? Colors.white.withAlpha(51) : Colors.white24)
+                    : Colors.white.withAlpha(
+                        25,
+                      )), // More transparent when disabled
             shape: BoxShape.circle,
           ),
           child: IconButton(
             icon: Icon(icon),
-            color: Colors.white,
+            color: isEnabled
+                ? Colors.white
+                : Colors.white38, // Dimmed when disabled
             iconSize: 28,
-            onPressed: onPressed,
+            onPressed: isEnabled
+                ? onPressed
+                : null, // Disable when isEnabled is false
             padding: const EdgeInsets.all(16),
           ),
         ),
         const SizedBox(height: 8),
-        Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
+        Text(
+          label,
+          style: TextStyle(
+            color: isEnabled
+                ? Colors.white
+                : Colors.white38, // Dimmed when disabled
+            fontSize: 12,
+          ),
+        ),
       ],
     );
   }
