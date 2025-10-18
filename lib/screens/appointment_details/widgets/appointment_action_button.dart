@@ -3,6 +3,7 @@ import 'package:ayur_scoliosis_management/core/theme.dart';
 import 'package:ayur_scoliosis_management/core/utils/api.dart';
 import 'package:ayur_scoliosis_management/models/appointment/appointment_respond.dart';
 import 'package:ayur_scoliosis_management/providers/profile/profile.dart';
+import 'package:ayur_scoliosis_management/providers/video_call/video_call.dart';
 import 'package:ayur_scoliosis_management/services/video_call/video_call_service.dart';
 import 'package:ayur_scoliosis_management/widgets/app_text_field.dart';
 import 'package:ayur_scoliosis_management/widgets/buttons/primary_button.dart';
@@ -169,14 +170,31 @@ class AppointmentActionButton extends HookConsumerWidget {
           // For remote appointments, show video call button
           if (appointment.type == AppointmentType.remote) {
             final canJoin = canJoinCall();
+
+            // Check if there's already an active call for this appointment
+            final videoCallState = ref.watch(videoCallProvider);
+            final isCallActive =
+                videoCallState.callState == CallState.connected &&
+                videoCallState.room?.appointmentId == appointment.id;
+
             return PrimaryButton(
-              label: canJoin
-                  ? 'Join Video Call'
-                  : 'Video Call (Not Yet Available)',
+              label: isCallActive
+                  ? 'Return to Call'
+                  : (canJoin
+                        ? 'Join Video Call'
+                        : 'Video Call (Not Yet Available)'),
               isLoading: isLoading.value,
-              backgroundColor: canJoin ? AppTheme.primary : Colors.grey,
-              onPressed: canJoin
+              backgroundColor: isCallActive
+                  ? Colors.green
+                  : (canJoin ? AppTheme.primary : Colors.grey),
+              onPressed: (canJoin || isCallActive)
                   ? () async {
+                      // If call is already active, just navigate back to it
+                      if (isCallActive) {
+                        context.push(AppRouter.videoCall(appointment.id));
+                        return;
+                      }
+
                       isLoading.value = true;
                       try {
                         // Create or get the video call room

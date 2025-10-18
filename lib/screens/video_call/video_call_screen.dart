@@ -57,7 +57,8 @@ class _VideoCallScreenState extends ConsumerState<VideoCallScreen> {
   void dispose() {
     _localRenderer.dispose();
     _remoteRenderer.dispose();
-    ref.read(videoCallProvider.notifier).leaveCall();
+    // Don't automatically leave the call - user must explicitly end it
+    // This allows them to navigate away and come back
     super.dispose();
   }
 

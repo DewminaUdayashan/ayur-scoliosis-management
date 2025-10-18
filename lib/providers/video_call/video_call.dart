@@ -110,6 +110,17 @@ class VideoCall extends _$VideoCall {
   /// Join a video call by appointment ID
   Future<void> joinCall(String appointmentId) async {
     try {
+      // Check if already in a call
+      if (state.callState == CallState.connected ||
+          state.callState == CallState.connecting) {
+        // If already in this appointment's call, just return
+        if (state.room?.appointmentId == appointmentId) {
+          return;
+        }
+        // Otherwise, leave current call first
+        await leaveCall();
+      }
+
       state = state.copyWith(callState: CallState.connecting);
 
       // Get room information
