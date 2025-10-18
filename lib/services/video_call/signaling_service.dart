@@ -80,6 +80,16 @@ class SignalingService {
         _eventController.add({'event': 'call-ended', 'data': data});
       });
 
+      _socket?.on('video-toggled', (data) {
+        debugPrint('Video toggled by remote user: $data');
+        _eventController.add({'event': 'video-toggled', 'data': data});
+      });
+
+      _socket?.on('audio-toggled', (data) {
+        debugPrint('Audio toggled by remote user: $data');
+        _eventController.add({'event': 'audio-toggled', 'data': data});
+      });
+
       _socket?.on('error', (error) {
         debugPrint('Socket error: $error');
         _eventController.add({'event': 'error', 'data': error});
@@ -124,6 +134,24 @@ class SignalingService {
   /// End the call
   void endCall(String roomId, String userId) {
     _socket?.emit('end-call', {'roomId': roomId, 'userId': userId});
+  }
+
+  /// Notify other participants about video toggle
+  void toggleVideo(String roomId, String userId, bool isEnabled) {
+    _socket?.emit('toggle-video', {
+      'roomId': roomId,
+      'userId': userId,
+      'isEnabled': isEnabled,
+    });
+  }
+
+  /// Notify other participants about audio toggle
+  void toggleAudio(String roomId, String userId, bool isEnabled) {
+    _socket?.emit('toggle-audio', {
+      'roomId': roomId,
+      'userId': userId,
+      'isEnabled': isEnabled,
+    });
   }
 
   /// Check if connected

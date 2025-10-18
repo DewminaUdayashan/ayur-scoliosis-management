@@ -22,6 +22,8 @@ class VideoCallState {
   final bool isAudioEnabled;
   final bool isVideoEnabled;
   final bool isScreenSharing;
+  final bool remoteVideoEnabled; // Track remote participant's video state
+  final bool remoteAudioEnabled; // Track remote participant's audio state
   final String? error;
 
   const VideoCallState({
@@ -32,6 +34,8 @@ class VideoCallState {
     required this.isAudioEnabled,
     required this.isVideoEnabled,
     required this.isScreenSharing,
+    this.remoteVideoEnabled = true, // Default to true until we hear otherwise
+    this.remoteAudioEnabled = true,
     this.error,
   });
 
@@ -43,6 +47,8 @@ class VideoCallState {
     bool? isAudioEnabled,
     bool? isVideoEnabled,
     bool? isScreenSharing,
+    bool? remoteVideoEnabled,
+    bool? remoteAudioEnabled,
     String? error,
   }) {
     return VideoCallState(
@@ -53,6 +59,8 @@ class VideoCallState {
       isAudioEnabled: isAudioEnabled ?? this.isAudioEnabled,
       isVideoEnabled: isVideoEnabled ?? this.isVideoEnabled,
       isScreenSharing: isScreenSharing ?? this.isScreenSharing,
+      remoteVideoEnabled: remoteVideoEnabled ?? this.remoteVideoEnabled,
+      remoteAudioEnabled: remoteAudioEnabled ?? this.remoteAudioEnabled,
       error: error,
     );
   }
@@ -204,6 +212,20 @@ class VideoCall extends _$VideoCall {
         debugPrint('User left the call');
         break;
 
+      case 'video-toggled':
+        // Remote participant toggled their video
+        final isEnabled = data['isEnabled'] as bool;
+        debugPrint('Remote video toggled: $isEnabled');
+        state = state.copyWith(remoteVideoEnabled: isEnabled);
+        break;
+
+      case 'audio-toggled':
+        // Remote participant toggled their audio
+        final isEnabled = data['isEnabled'] as bool;
+        debugPrint('Remote audio toggled: $isEnabled');
+        state = state.copyWith(remoteAudioEnabled: isEnabled);
+        break;
+
       case 'error':
         state = state.copyWith(
           callState: CallState.error,
@@ -257,13 +279,33 @@ class VideoCall extends _$VideoCall {
   /// Toggle audio
   void toggleAudio() {
     _webrtcService.toggleAudio();
-    state = state.copyWith(isAudioEnabled: _webrtcService.isAudioEnabled);
+    final isEnabled = _webrtcService.isAudioEnabled;
+    state = state.copyWith(isAudioEnabled: isEnabled);
+
+    // Notify remote participant via signaling
+    if (_currentRoomId != null && _currentUserId != null) {
+      _signalingService.toggleAudio(
+        _currentRoomId!,
+        _currentUserId!,
+        isEnabled,
+      );
+    }
   }
 
   /// Toggle video
   void toggleVideo() {
     _webrtcService.toggleVideo();
-    state = state.copyWith(isVideoEnabled: _webrtcService.isVideoEnabled);
+    final isEnabled = _webrtcService.isVideoEnabled;
+    state = state.copyWith(isVideoEnabled: isEnabled);
+
+    // Notify remote participant via signaling
+    if (_currentRoomId != null && _currentUserId != null) {
+      _signalingService.toggleVideo(
+        _currentRoomId!,
+        _currentUserId!,
+        isEnabled,
+      );
+    }
   }
 
   /// Switch camera
