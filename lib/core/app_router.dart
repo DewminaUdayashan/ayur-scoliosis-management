@@ -2,6 +2,7 @@ import 'package:ayur_scoliosis_management/screens/appointment_details/appointmen
 import 'package:ayur_scoliosis_management/screens/auth/new_password_screen.dart';
 import 'package:ayur_scoliosis_management/screens/auth/registration_screen.dart';
 import 'package:ayur_scoliosis_management/screens/measurement/xray_measure_screen.dart';
+import 'package:ayur_scoliosis_management/screens/video_call/video_call_screen.dart';
 import 'package:flutter/material.dart' show NavigatorState, GlobalKey;
 import 'package:go_router/go_router.dart';
 
@@ -32,6 +33,10 @@ class AppRouter {
   static String appointmentDetails(String id) =>
       '$home/appointment-details/$id';
   static const _appointmentDetailsPath = 'appointment-details/:id';
+
+  static String videoCall(String appointmentId) =>
+      '$home/video-call/$appointmentId';
+  static const _videoCallPath = 'video-call/:appointmentId';
 
   static const measurementTool = '/measurement-tool';
 
@@ -89,6 +94,13 @@ class AppRouter {
             builder: (context, state) {
               final id = state.pathParameters['id']!;
               return AppointmentDetailsScreen(appointmentId: id);
+            },
+          ),
+          GoRoute(
+            path: _videoCallPath,
+            builder: (context, state) {
+              final appointmentId = state.pathParameters['appointmentId']!;
+              return VideoCallScreen(appointmentId: appointmentId);
             },
           ),
         ],

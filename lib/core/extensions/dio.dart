@@ -1,5 +1,9 @@
 import 'package:ayur_scoliosis_management/core/exceptions.dart'
-    show ApiException, EmailAlreadyRegistered, AppApiException;
+    show
+        ApiException,
+        EmailAlreadyRegistered,
+        AppApiException,
+        TimeSlotNotAvailable;
 import 'package:dio/dio.dart';
 
 extension DioExceptionExtension on DioException {
@@ -19,6 +23,14 @@ extension DioExceptionExtension on DioException {
 
   AppApiException processException() {
     if (response?.statusCode == 409) {
+      if (response?.data is Map<String, dynamic>) {
+        final data = response!.data as Map<String, dynamic>;
+        final message = data['message'];
+        if (message ==
+            'This time slot is already booked. Please choose another time.') {
+          return TimeSlotNotAvailable();
+        }
+      }
       return EmailAlreadyRegistered();
     }
     return ApiException(errorMessage);

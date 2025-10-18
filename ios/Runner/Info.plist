@@ -47,5 +47,9 @@
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app requires access to your photo library to select and upload images.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app requires access to your camera for video calling with healthcare professionals.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app requires access to your microphone for video calling with healthcare professionals.</string>
 </dict>
 </plist>

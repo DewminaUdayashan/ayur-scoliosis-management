@@ -1,3 +1,4 @@
+import 'package:ayur_scoliosis_management/core/app_router.dart';
 import 'package:ayur_scoliosis_management/core/extensions/date_time.dart';
 import 'package:ayur_scoliosis_management/core/extensions/theme.dart';
 import 'package:ayur_scoliosis_management/models/appointment/appointment_respond.dart';
@@ -6,6 +7,7 @@ import 'package:ayur_scoliosis_management/widgets/buttons/primary_button.dart';
 import 'package:ayur_scoliosis_management/widgets/skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../../../core/enums.dart';
@@ -32,146 +34,157 @@ class PatientAppointmentCard extends HookConsumerWidget {
 
         final timeUntilText = appointment.timeUntilAppointment;
 
-        return Card(
-          color: Colors.white,
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12.0),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withAlpha(8),
-                  spreadRadius: 1,
-                  blurRadius: 8,
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 5,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        color:
-                            appointment.status ==
-                                AppointmentStatus.pendingConfirmation
-                            ? Colors.grey
-                            : appointment.status.backgroundColor,
-                        borderRadius: BorderRadius.circular(8),
+        return InkWell(
+          onTap: () =>
+              context.push(AppRouter.appointmentDetails(appointment.id)),
+          child: Card(
+            color: Colors.white,
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withAlpha(8),
+                    spreadRadius: 1,
+                    blurRadius: 8,
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 5,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          color:
+                              appointment.status ==
+                                  AppointmentStatus.pendingConfirmation
+                              ? Colors.grey
+                              : appointment.status.backgroundColor,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        spacing: 4,
+                        children: [
+                          Text(
+                            '${appointment.name} - Dr.${appointment.practitioner?.firstName}',
+                            style: context.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            '${appointment.appointmentDateTime.readableTimeAndDate} - ${appointment.type.value}',
+                            style: context.textTheme.bodyMedium?.copyWith(
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                          Text(
+                            appointment.status.value,
+                            style: context.textTheme.bodyMedium?.copyWith(
+                              color: appointment.status.backgroundColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Spacer(),
+                      CircleAvatar(radius: 24),
+                    ],
+                  ),
+                  // --- Conditional Action Buttons ---
+                  if (appointment.status ==
+                      AppointmentStatus.pendingConfirmation)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: OutlinedAppButton(
+                              label: 'Request New Timeslot',
+                              isLoading: isRequesting.value,
+                              onPressed: () async {
+                                isRequesting.value = true;
+                                try {
+                                  await ref
+                                      .read(
+                                        appointmentDetailsProvider(
+                                          appointment.id,
+                                        ).notifier,
+                                      )
+                                      .respond(
+                                        AppointmentRespond(
+                                          id: appointment.id,
+                                          accepted: false,
+                                        ),
+                                      );
+                                } finally {
+                                  ref.invalidate(
+                                    appointmentDetailsProvider(appointment.id),
+                                  );
+                                  isRequesting.value = false;
+                                }
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: PrimaryButton(
+                              label: 'Accept',
+                              isLoading: isAccepting.value,
+                              height: 20,
+                              onPressed: () async {
+                                isAccepting.value = true;
+                                try {
+                                  await ref
+                                      .read(
+                                        appointmentDetailsProvider(
+                                          appointment.id,
+                                        ).notifier,
+                                      )
+                                      .respond(
+                                        AppointmentRespond(
+                                          id: appointment.id,
+                                          accepted: true,
+                                        ),
+                                      );
+                                } finally {
+                                  ref.invalidate(
+                                    appointmentDetailsProvider(appointment.id),
+                                  );
+                                  isAccepting.value = false;
+                                }
+                              },
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(width: 16),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: 4,
-                      children: [
-                        Text(
-                          '${appointment.name} - Dr.${appointment.practitioner?.firstName}',
-                          style: context.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          '${appointment.appointmentDateTime.readableTimeAndDate} - ${appointment.type.value}',
-                          style: context.textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                        Text(
-                          appointment.status.value,
-                          style: context.textTheme.bodyMedium?.copyWith(
-                            color: appointment.status.backgroundColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const Spacer(),
-                    CircleAvatar(radius: 24),
-                  ],
-                ),
-                // --- Conditional Action Buttons ---
-                if (appointment.status == AppointmentStatus.pendingConfirmation)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16.0),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          flex: 2,
-                          child: OutlinedAppButton(
-                            label: 'Request New Timeslot',
-                            isLoading: isRequesting.value,
-                            onPressed: () async {
-                              isRequesting.value = true;
-                              try {
-                                await ref
-                                    .read(
-                                      appointmentDetailsProvider(
-                                        appointment.id,
-                                      ).notifier,
-                                    )
-                                    .respond(
-                                      AppointmentRespond(
-                                        id: appointment.id,
-                                        accepted: false,
-                                      ),
-                                    );
-                              } finally {
-                                ref.invalidate(
-                                  appointmentDetailsProvider(appointment.id),
+                  if (appointment.status == AppointmentStatus.scheduled &&
+                      appointment.type == AppointmentType.remote)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16.0),
+                      child: PrimaryButton(
+                        isLoading: false,
+                        label: canJoin ? 'Join' : 'Join in $timeUntilText',
+                        height: 20,
+                        onPressed: canJoin
+                            ? () {
+                                context.push(
+                                  AppRouter.videoCall(appointment.id),
                                 );
-                                isRequesting.value = false;
                               }
-                            },
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: PrimaryButton(
-                            label: 'Accept',
-                            isLoading: isAccepting.value,
-                            height: 20,
-                            onPressed: () async {
-                              isAccepting.value = true;
-                              try {
-                                await ref
-                                    .read(
-                                      appointmentDetailsProvider(
-                                        appointment.id,
-                                      ).notifier,
-                                    )
-                                    .respond(
-                                      AppointmentRespond(
-                                        id: appointment.id,
-                                        accepted: true,
-                                      ),
-                                    );
-                              } finally {
-                                ref.invalidate(
-                                  appointmentDetailsProvider(appointment.id),
-                                );
-                                isAccepting.value = false;
-                              }
-                            },
-                          ),
-                        ),
-                      ],
+                            : null,
+                      ),
                     ),
-                  ),
-                if (appointment.status == AppointmentStatus.scheduled &&
-                    appointment.type == AppointmentType.remote)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16.0),
-                    child: PrimaryButton(
-                      isLoading: false,
-                      label: canJoin ? 'Join' : 'Join in $timeUntilText',
-                      height: 20,
-                      onPressed: canJoin ? () {} : null,
-                    ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ),
         );

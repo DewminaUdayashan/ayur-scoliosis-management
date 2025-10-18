@@ -1,9 +1,15 @@
 import 'package:ayur_scoliosis_management/core/app_router.dart';
 import 'package:ayur_scoliosis_management/core/extensions/date_time.dart';
 import 'package:ayur_scoliosis_management/core/extensions/theme.dart';
+import 'package:ayur_scoliosis_management/core/theme.dart';
+import 'package:ayur_scoliosis_management/core/utils/api.dart';
+import 'package:ayur_scoliosis_management/providers/dio/dio.dart';
+import 'package:ayur_scoliosis_management/providers/video_call/video_call.dart';
+import 'package:ayur_scoliosis_management/services/video_call/video_call_service.dart';
 import 'package:ayur_scoliosis_management/widgets/buttons/primary_button.dart';
 import 'package:ayur_scoliosis_management/widgets/skeleton.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -17,16 +23,22 @@ class PractitionerAppointmentCard extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isLoading = useState(false);
     final appointmentDetailsAsync = ref.watch(
       appointmentDetailsProvider(appointment.id),
     );
     return appointmentDetailsAsync.when(
       data: (appointment) {
-        final canJoin =
-            appointment.type == AppointmentType.remote &&
-            (appointment.appointmentDateTime.isAtSameMomentAs(DateTime.now()) ||
-                appointment.appointmentDateTime.isBefore(DateTime.now()));
+        // Helper function to check if appointment time is near (within 15 minutes before or anytime after)
+        bool canJoinCall() {
+          final now = DateTime.now();
+          final appointmentTime = appointment.appointmentDateTime.toLocal();
+          final difference = appointmentTime.difference(now);
+          // Allow joining 15 minutes before the appointment or anytime after
+          return difference.inMinutes <= 15;
+        }
 
+        final canJoin = canJoinCall();
         final timeUntilText = appointment.timeUntilAppointment;
 
         return Card(
@@ -97,11 +109,84 @@ class PractitionerAppointmentCard extends HookConsumerWidget {
                       appointment.type == AppointmentType.remote)
                     Padding(
                       padding: const EdgeInsets.only(top: 16.0),
-                      child: PrimaryButton(
-                        isLoading: false,
-                        label: canJoin ? 'Join' : 'Join in $timeUntilText',
-                        height: 20,
-                        onPressed: canJoin ? () {} : null,
+                      child: Builder(
+                        builder: (context) {
+                          // Check if there's already an active call for this appointment
+                          final videoCallState = ref.watch(videoCallProvider);
+                          final isCallActive =
+                              videoCallState.callState == CallState.connected &&
+                              videoCallState.room?.appointmentId ==
+                                  appointment.id;
+
+                          return PrimaryButton(
+                            isLoading: isLoading.value,
+                            label: isCallActive
+                                ? 'Return to Call'
+                                : (canJoin ? 'Join' : 'Join in $timeUntilText'),
+                            height: 20,
+                            backgroundColor: isCallActive
+                                ? Colors.green
+                                : (canJoin ? AppTheme.primary : Colors.grey),
+                            onPressed: (canJoin || isCallActive)
+                                ? () async {
+                                    // If call is already active, just navigate back to it
+                                    if (isCallActive) {
+                                      context.push(
+                                        AppRouter.videoCall(appointment.id),
+                                      );
+                                      return;
+                                    }
+
+                                    isLoading.value = true;
+                                    try {
+                                      // Create or get the video call room
+                                      final dio = ref.read(dioProvider);
+                                      final videoCallService =
+                                          VideoCallServiceImpl(
+                                            api: Api(),
+                                            client: dio,
+                                          );
+
+                                      try {
+                                        // Try to get existing room
+                                        await videoCallService
+                                            .getRoomByAppointment(
+                                              appointment.id,
+                                            );
+                                      } catch (e) {
+                                        // If room doesn't exist, create it
+                                        await videoCallService
+                                            .createRoomForAppointment(
+                                              appointment.id,
+                                            );
+                                      }
+
+                                      // Navigate to video call screen
+                                      if (context.mounted) {
+                                        context.push(
+                                          AppRouter.videoCall(appointment.id),
+                                        );
+                                      }
+                                    } catch (e) {
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              'Failed to join video call: $e',
+                                            ),
+                                            backgroundColor: AppTheme.error,
+                                          ),
+                                        );
+                                      }
+                                    } finally {
+                                      isLoading.value = false;
+                                    }
+                                  }
+                                : null,
+                          );
+                        },
                       ),
                     ),
                 ],

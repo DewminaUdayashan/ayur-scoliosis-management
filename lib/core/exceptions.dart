@@ -21,3 +21,7 @@ class PasswordMustChanged extends AppApiException {
   PasswordMustChanged(this.tempToken)
     : super('Password must be changed before proceeding.');
 }
+
+class TimeSlotNotAvailable extends AppApiException {
+  TimeSlotNotAvailable() : super('The selected time slot is not available.');
+}

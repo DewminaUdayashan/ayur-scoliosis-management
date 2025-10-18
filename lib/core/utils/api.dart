@@ -5,11 +5,11 @@ class Api {
 
   // For development on different platforms
   static String get baseUrl {
-    return 'http://localhost:3000'; // Default to localhost for development
+    return 'http://192.168.1.120:3000'; // Default to localhost for development
   }
 
   static String get classifierBaseUrl {
-    return 'http://localhost:8000';
+    return 'http://192.168.1.120:8000';
   }
 
   static final _apiPath = '/';
@@ -50,6 +50,14 @@ class Api {
 
   /// Event endpoints
   String get eventsPath => '$_apiPath/patient-event';
+
+  /// Video Call endpoints
+  String get videoCallPath => '$_apiPath/video-call';
+  String get videoCallRoom => '$videoCallPath/room';
+  String videoCallRoomByAppointment(String appointmentId) =>
+      '$videoCallRoom/appointment/$appointmentId';
+  String createVideoCallRoom(String appointmentId) =>
+      '$videoCallRoom/appointment/$appointmentId/create';
 
   String get classifyImageType => '$classifierBaseUrl/classify_image_type';
 }
