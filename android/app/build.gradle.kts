@@ -7,7 +7,6 @@ plugins {
 
 android {
     namespace = "com.example.ayur_scoliosis_management"
-    ndkVersion = flutter.ndkVersion
     compileSdk = 36
     ndkVersion = "27.0.12077973"
 

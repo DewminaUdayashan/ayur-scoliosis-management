@@ -41,6 +41,7 @@ class AppTextField extends StatelessWidget {
             onChanged: onChanged,
             keyboardType: keyboardType,
             textInputAction: textInputAction,
+            onTapOutside: (_) => FocusScope.of(context).unfocus(),
             errorBuilder: (context, error) {
               return Text(
                 error,
