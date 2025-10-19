@@ -25,4 +25,30 @@ class AppointmentDetails extends _$AppointmentDetails {
       showErrorSnack(e.toString());
     }
   }
+
+  Future<void> complete() async {
+    try {
+      final appointment = await ref
+          .watch(appointmentServiceProvider)
+          .completeAppointment(appointmentId);
+      state = AsyncValue.data(appointment);
+      ref.invalidate(upcomingAppointmentsProvider);
+    } catch (e) {
+      showErrorSnack(e.toString());
+      rethrow;
+    }
+  }
+
+  Future<void> completeWithNotes(String notes) async {
+    try {
+      final appointment = await ref
+          .watch(appointmentServiceProvider)
+          .completeAppointmentWithNotes(appointmentId, notes);
+      state = AsyncValue.data(appointment);
+      ref.invalidate(upcomingAppointmentsProvider);
+    } catch (e) {
+      showErrorSnack(e.toString());
+      rethrow;
+    }
+  }
 }

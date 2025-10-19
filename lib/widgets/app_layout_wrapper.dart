@@ -1,3 +1,4 @@
+import 'package:ayur_scoliosis_management/widgets/session_notes_floating_indicator.dart';
 import 'package:ayur_scoliosis_management/widgets/video_call_floating_indicator.dart';
 import 'package:flutter/material.dart';
 
@@ -16,6 +17,8 @@ class AppLayoutWrapper extends StatelessWidget {
         child,
         // Global floating indicator for active video calls
         const VideoCallFloatingIndicator(),
+        // Global floating indicator for active sessions with notes
+        const SessionNotesFloatingIndicator(),
       ],
     );
   }

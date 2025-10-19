@@ -2,6 +2,7 @@ import 'package:ayur_scoliosis_management/core/app_router.dart';
 import 'package:ayur_scoliosis_management/core/extensions/date_time.dart';
 import 'package:ayur_scoliosis_management/core/extensions/theme.dart';
 import 'package:ayur_scoliosis_management/models/appointment/appointment_respond.dart';
+import 'package:ayur_scoliosis_management/providers/session/active_session.dart';
 import 'package:ayur_scoliosis_management/widgets/buttons/outlined_app_button.dart';
 import 'package:ayur_scoliosis_management/widgets/buttons/primary_button.dart';
 import 'package:ayur_scoliosis_management/widgets/skeleton.dart';
@@ -176,6 +177,11 @@ class PatientAppointmentCard extends HookConsumerWidget {
                         height: 20,
                         onPressed: canJoin
                             ? () {
+                                // Start the remote session
+                                ref
+                                    .read(activeSessionProvider.notifier)
+                                    .startSession(appointment.id, 'Remote');
+
                                 context.push(
                                   AppRouter.videoCall(appointment.id),
                                 );

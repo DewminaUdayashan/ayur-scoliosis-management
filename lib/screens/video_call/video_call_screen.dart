@@ -1,4 +1,6 @@
+import 'package:ayur_scoliosis_management/providers/appointment/appointment_details.dart';
 import 'package:ayur_scoliosis_management/providers/profile/profile.dart';
+import 'package:ayur_scoliosis_management/providers/session/active_session.dart';
 import 'package:ayur_scoliosis_management/providers/video_call/is_in_call.dart';
 import 'package:ayur_scoliosis_management/providers/video_call/video_call.dart';
 import 'package:flutter/cupertino.dart';
@@ -468,6 +470,110 @@ class VideoCallScreen extends HookConsumerWidget {
                           icon: CupertinoIcons.phone_down_fill,
                           label: 'End',
                           onPressed: () async {
+                            // Check if there's an active session with notes
+                            final activeSession = ref.read(
+                              activeSessionProvider,
+                            );
+
+                            if (activeSession != null &&
+                                activeSession.appointmentId == appointmentId) {
+                              // Ask about notes if there are any
+                              if (activeSession.notes.isNotEmpty) {
+                                final result = await showDialog<String>(
+                                  context: context,
+                                  builder: (ctx) => AlertDialog(
+                                    backgroundColor: Colors.white,
+                                    title: const Text(
+                                      'End Call & Complete Session',
+                                    ),
+                                    content: const Text(
+                                      'You have session notes. Would you like to save them and complete this appointment?',
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => ctx.pop('cancel'),
+                                        child: const Text('Cancel'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () => ctx.pop('discard'),
+                                        child: const Text('End Without Saving'),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () => ctx.pop('save'),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.green,
+                                        ),
+                                        child: const Text('Save & Complete'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+
+                                if (result == 'cancel') return;
+
+                                if (result == 'save') {
+                                  // Show loading
+                                  if (context.mounted) {
+                                    showDialog(
+                                      context: context,
+                                      barrierDismissible: false,
+                                      builder: (ctx) => const Center(
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                    );
+                                  }
+
+                                  try {
+                                    // Complete with notes
+                                    await ref
+                                        .read(
+                                          appointmentDetailsProvider(
+                                            appointmentId,
+                                          ).notifier,
+                                        )
+                                        .completeWithNotes(activeSession.notes);
+
+                                    // End session
+                                    ref
+                                        .read(activeSessionProvider.notifier)
+                                        .endSession();
+
+                                    // Close loading
+                                    if (context.mounted) {
+                                      Navigator.of(context).pop();
+                                    }
+                                  } catch (e) {
+                                    // Close loading
+                                    if (context.mounted) {
+                                      Navigator.of(context).pop();
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            'Failed to save notes: $e',
+                                          ),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                    }
+                                    return;
+                                  }
+                                } else {
+                                  // Just end session without saving
+                                  ref
+                                      .read(activeSessionProvider.notifier)
+                                      .endSession();
+                                }
+                              } else {
+                                // No notes, just end session
+                                ref
+                                    .read(activeSessionProvider.notifier)
+                                    .endSession();
+                              }
+                            }
+
+                            // End the call
                             await ref
                                 .read(videoCallProvider.notifier)
                                 .leaveCall();
