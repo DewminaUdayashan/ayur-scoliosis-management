@@ -39,6 +39,8 @@ class Api {
   String get scheduleAppointment => '$appointmentsPath/schedule';
   String get checkAvailability => '$appointmentsPath/check-availability';
   String respondToAppointment(String id) => '$appointmentsPath/$id/respond';
+  String completeAppointment(String id) => '$appointmentsPath/$id/complete';
+  String updateAppointmentNotes(String id) => '$appointmentsPath/$id/notes';
   String get upcomingAppointments => '$appointmentsPath/upcoming';
   String get dates => '$appointmentsPath/dates';
 

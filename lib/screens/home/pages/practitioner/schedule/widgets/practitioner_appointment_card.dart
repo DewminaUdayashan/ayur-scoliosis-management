@@ -4,6 +4,7 @@ import 'package:ayur_scoliosis_management/core/extensions/theme.dart';
 import 'package:ayur_scoliosis_management/core/theme.dart';
 import 'package:ayur_scoliosis_management/core/utils/api.dart';
 import 'package:ayur_scoliosis_management/providers/dio/dio.dart';
+import 'package:ayur_scoliosis_management/providers/session/active_session.dart';
 import 'package:ayur_scoliosis_management/providers/video_call/video_call.dart';
 import 'package:ayur_scoliosis_management/services/video_call/video_call_service.dart';
 import 'package:ayur_scoliosis_management/widgets/buttons/primary_button.dart';
@@ -160,6 +161,14 @@ class PractitionerAppointmentCard extends HookConsumerWidget {
                                               appointment.id,
                                             );
                                       }
+
+                                      // Start the remote session
+                                      ref
+                                          .read(activeSessionProvider.notifier)
+                                          .startSession(
+                                            appointment.id,
+                                            'Remote',
+                                          );
 
                                       // Navigate to video call screen
                                       if (context.mounted) {

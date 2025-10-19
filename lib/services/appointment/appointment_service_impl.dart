@@ -92,6 +92,39 @@ class AppointmentServiceImpl extends AppointmentService {
   }
 
   @override
+  Future<Appointment> completeAppointment(String appointmentId) async {
+    try {
+      final response = await client.patch(
+        api.completeAppointment(appointmentId),
+      );
+      return Appointment.fromJson(response.data);
+    } on DioException catch (e) {
+      throw e.processException();
+    }
+  }
+
+  @override
+  Future<Appointment> completeAppointmentWithNotes(
+    String appointmentId,
+    String notes,
+  ) async {
+    try {
+      // First update the notes
+      await client.patch(
+        api.updateAppointmentNotes(appointmentId),
+        data: {'notes': notes},
+      );
+      // Then complete the appointment
+      final response = await client.patch(
+        api.completeAppointment(appointmentId),
+      );
+      return Appointment.fromJson(response.data);
+    } on DioException catch (e) {
+      throw e.processException();
+    }
+  }
+
+  @override
   Future<List<DateTime>> getAppointmentDates(DateTime from, DateTime to) async {
     try {
       final response = await client.get(

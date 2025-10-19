@@ -3,6 +3,7 @@ import 'package:ayur_scoliosis_management/core/theme.dart';
 import 'package:ayur_scoliosis_management/core/utils/api.dart';
 import 'package:ayur_scoliosis_management/models/appointment/appointment_respond.dart';
 import 'package:ayur_scoliosis_management/providers/profile/profile.dart';
+import 'package:ayur_scoliosis_management/providers/session/active_session.dart';
 import 'package:ayur_scoliosis_management/providers/video_call/video_call.dart';
 import 'package:ayur_scoliosis_management/services/video_call/video_call_service.dart';
 import 'package:ayur_scoliosis_management/widgets/app_text_field.dart';
@@ -30,6 +31,7 @@ class AppointmentActionButton extends HookConsumerWidget {
     );
     final profile = ref.watch(profileProvider).valueOrNull;
     final isPatient = profile?.isPatient;
+    final activeSession = ref.watch(activeSessionProvider);
 
     final formKey = useMemoized(() => GlobalKey<FormState>());
 
@@ -167,7 +169,7 @@ class AppointmentActionButton extends HookConsumerWidget {
         }
 
         if (appointment.status == AppointmentStatus.scheduled) {
-          // For remote appointments, show video call button
+          // For remote appointments, show video call button and complete button
           if (appointment.type == AppointmentType.remote) {
             final canJoin = canJoinCall();
 
@@ -177,75 +179,350 @@ class AppointmentActionButton extends HookConsumerWidget {
                 videoCallState.callState == CallState.connected &&
                 videoCallState.room?.appointmentId == appointment.id;
 
-            return PrimaryButton(
-              label: isCallActive
-                  ? 'Return to Call'
-                  : (canJoin
-                        ? 'Join Video Call'
-                        : 'Video Call (Not Yet Available)'),
-              isLoading: isLoading.value,
-              backgroundColor: isCallActive
-                  ? Colors.green
-                  : (canJoin ? AppTheme.primary : Colors.grey),
-              onPressed: (canJoin || isCallActive)
-                  ? () async {
-                      // If call is already active, just navigate back to it
-                      if (isCallActive) {
-                        context.push(AppRouter.videoCall(appointment.id));
-                        return;
-                      }
+            final isAnySessionActive = activeSession != null;
+            final isDifferentSessionActive =
+                isAnySessionActive &&
+                activeSession.appointmentId != appointment.id;
 
-                      isLoading.value = true;
-                      try {
-                        // Create or get the video call room
-                        final dio = ref.read(dioProvider);
-                        final videoCallService = VideoCallServiceImpl(
-                          api: Api(),
-                          client: dio,
+            // If call is active or has been joined, show both join and complete buttons
+            if (isCallActive || canJoin) {
+              return Row(
+                spacing: 16,
+                children: [
+                  Expanded(
+                    child: PrimaryButton(
+                      label: isCallActive
+                          ? 'Return to Call'
+                          : (isDifferentSessionActive
+                                ? 'Join (End other session first)'
+                                : 'Join Call'),
+                      isLoading: isLoading.value,
+                      backgroundColor: isCallActive
+                          ? Colors.green
+                          : (isDifferentSessionActive
+                                ? Colors.grey
+                                : AppTheme.primary),
+                      onPressed: isDifferentSessionActive
+                          ? null
+                          : () async {
+                              // If call is already active, just navigate back to it
+                              if (isCallActive) {
+                                context.push(
+                                  AppRouter.videoCall(appointment.id),
+                                );
+                                return;
+                              }
+
+                              isLoading.value = true;
+                              try {
+                                // Create or get the video call room
+                                final dio = ref.read(dioProvider);
+                                final videoCallService = VideoCallServiceImpl(
+                                  api: Api(),
+                                  client: dio,
+                                );
+
+                                try {
+                                  // Try to get existing room
+                                  await videoCallService.getRoomByAppointment(
+                                    appointment.id,
+                                  );
+                                } catch (e) {
+                                  // If room doesn't exist, create it
+                                  await videoCallService
+                                      .createRoomForAppointment(appointment.id);
+                                }
+
+                                // Start the remote session
+                                ref
+                                    .read(activeSessionProvider.notifier)
+                                    .startSession(appointment.id, 'Remote');
+
+                                // Navigate to video call screen
+                                if (context.mounted) {
+                                  context.push(
+                                    AppRouter.videoCall(appointment.id),
+                                  );
+                                }
+                              } catch (e) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Failed to join video call: $e',
+                                      ),
+                                      backgroundColor: AppTheme.error,
+                                    ),
+                                  );
+                                }
+                              } finally {
+                                isLoading.value = false;
+                              }
+                            },
+                    ),
+                  ),
+                  Expanded(
+                    child: PrimaryButton(
+                      label: 'Complete',
+                      isLoading: isLoading.value,
+                      backgroundColor: Colors.green,
+                      onPressed: () async {
+                        // Show confirmation dialog
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            backgroundColor: Colors.white,
+                            title: const Text('Complete Appointment'),
+                            content: const Text(
+                              'Mark this appointment as completed? This will notify the patient.',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => ctx.pop(false),
+                                child: const Text('Cancel'),
+                              ),
+                              ElevatedButton(
+                                onPressed: () => ctx.pop(true),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                ),
+                                child: const Text('Complete'),
+                              ),
+                            ],
+                          ),
                         );
 
-                        try {
-                          // Try to get existing room
-                          await videoCallService.getRoomByAppointment(
-                            appointment.id,
-                          );
-                        } catch (e) {
-                          // If room doesn't exist, create it
-                          await videoCallService.createRoomForAppointment(
-                            appointment.id,
-                          );
-                        }
+                        if (confirm == true) {
+                          isLoading.value = true;
+                          try {
+                            await ref
+                                .read(
+                                  appointmentDetailsProvider(
+                                    appointment.id,
+                                  ).notifier,
+                                )
+                                .complete();
 
-                        // Navigate to video call screen
-                        if (context.mounted) {
-                          context.push(AppRouter.videoCall(appointment.id));
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Appointment completed successfully',
+                                  ),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Failed to complete appointment: $e',
+                                  ),
+                                  backgroundColor: AppTheme.error,
+                                ),
+                              );
+                            }
+                          } finally {
+                            isLoading.value = false;
+                          }
                         }
-                      } catch (e) {
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Failed to join video call: $e'),
-                              backgroundColor: AppTheme.error,
-                            ),
-                          );
-                        }
-                      } finally {
-                        isLoading.value = false;
-                      }
-                    }
-                  : null,
+                      },
+                    ),
+                  ),
+                ],
+              );
+            }
+
+            // Before the join time, show only disabled join button
+            return PrimaryButton(
+              label: 'Video Call (Not Yet Available)',
+              isLoading: isLoading.value,
+              backgroundColor: Colors.grey,
+              onPressed: null,
             );
           }
 
           // For physical appointments
+          final isThisSessionActive =
+              activeSession?.appointmentId == appointment.id;
+          final isAnySessionActive = activeSession != null;
+
+          // If this appointment's session is active, show complete button
+          if (isThisSessionActive) {
+            return PrimaryButton(
+              label: 'Complete Session',
+              isLoading: isLoading.value,
+              backgroundColor: Colors.green,
+              onPressed: () async {
+                // Check if there are notes
+                final hasNotes = activeSession!.notes.isNotEmpty;
+
+                if (hasNotes) {
+                  // Ask if they want to save notes
+                  final saveNotes = await showDialog<bool>(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      backgroundColor: Colors.white,
+                      title: const Text('Complete Session'),
+                      content: const Text(
+                        'You have unsaved notes. Would you like to save them with this appointment?',
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => ctx.pop(false),
+                          child: const Text('Discard Notes'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () => ctx.pop(true),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                          ),
+                          child: const Text('Save Notes'),
+                        ),
+                      ],
+                    ),
+                  );
+
+                  if (saveNotes == null) return; // User cancelled
+
+                  isLoading.value = true;
+                  try {
+                    if (saveNotes) {
+                      await ref
+                          .read(
+                            appointmentDetailsProvider(appointment.id).notifier,
+                          )
+                          .completeWithNotes(activeSession.notes);
+                    } else {
+                      await ref
+                          .read(
+                            appointmentDetailsProvider(appointment.id).notifier,
+                          )
+                          .complete();
+                    }
+
+                    // End the session
+                    ref.read(activeSessionProvider.notifier).endSession();
+
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Session completed successfully'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Failed to complete session: $e'),
+                          backgroundColor: AppTheme.error,
+                        ),
+                      );
+                    }
+                  } finally {
+                    isLoading.value = false;
+                  }
+                } else {
+                  // No notes, just complete
+                  final confirm = await showDialog<bool>(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      backgroundColor: Colors.white,
+                      title: const Text('Complete Session'),
+                      content: const Text(
+                        'Mark this appointment as completed?',
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => ctx.pop(false),
+                          child: const Text('Cancel'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () => ctx.pop(true),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                          ),
+                          child: const Text('Complete'),
+                        ),
+                      ],
+                    ),
+                  );
+
+                  if (confirm == true) {
+                    isLoading.value = true;
+                    try {
+                      await ref
+                          .read(
+                            appointmentDetailsProvider(appointment.id).notifier,
+                          )
+                          .complete();
+
+                      // End the session
+                      ref.read(activeSessionProvider.notifier).endSession();
+
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Session completed successfully'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Failed to complete session: $e'),
+                            backgroundColor: AppTheme.error,
+                          ),
+                        );
+                      }
+                    } finally {
+                      isLoading.value = false;
+                    }
+                  }
+                }
+              },
+            );
+          }
+
+          // If another session is active, disable this button
+          if (isAnySessionActive) {
+            return PrimaryButton(
+              label: 'Start Session (Another session active)',
+              isLoading: false,
+              backgroundColor: Colors.grey,
+              onPressed: null,
+            );
+          }
+
+          // Show start session button
           return PrimaryButton(
             label: 'Start Session',
             isLoading: isLoading.value,
             onPressed: () {
-              // TODO: Implement logic to start session
+              // Start the physical session with the session state
+              ref
+                  .read(activeSessionProvider.notifier)
+                  .startSession(appointment.id, 'Physical');
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'Physical session started. Tap the floating icon to add notes.',
+                  ),
+                  backgroundColor: Colors.blue,
+                  duration: Duration(seconds: 3),
+                ),
+              );
             },
           );
         }
+
         // If completed or cancelled, show nothing
         return const SizedBox.shrink();
       },
