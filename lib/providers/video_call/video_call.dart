@@ -68,37 +68,52 @@ class VideoCallState {
 
 @riverpod
 class VideoCall extends _$VideoCall {
-  late final VideoCallService _videoCallService;
-  late final SignalingService _signalingService;
-  late final WebRTCService _webrtcService;
+  VideoCallService? _videoCallService;
+  SignalingService? _signalingService;
+  WebRTCService? _webrtcService;
   String? _currentRoomId;
   String? _currentUserId;
+  bool _initialized = false;
 
-  @override
-  VideoCallState build() {
-    final dio = ref.watch(dioProvider);
-    final api = Api();
+  VideoCallService get videoCallService {
+    if (_videoCallService == null) {
+      final dio = ref.read(dioProvider);
+      final api = Api();
+      _videoCallService = VideoCallServiceImpl(api: api, client: dio);
+    }
+    return _videoCallService!;
+  }
 
-    _videoCallService = VideoCallServiceImpl(api: api, client: dio);
-    _signalingService = SignalingService(serverUrl: Api.baseUrl);
-    _webrtcService = WebRTCService();
+  SignalingService get signalingService {
+    _signalingService ??= SignalingService(serverUrl: Api.baseUrl);
+    return _signalingService!;
+  }
+
+  WebRTCService get webrtcService {
+    _webrtcService ??= WebRTCService();
+    return _webrtcService!;
+  }
+
+  void _initializeServices() {
+    if (_initialized) return;
+    _initialized = true;
 
     // Listen to signaling events
-    _signalingService.events.listen(_handleSignalingEvent);
+    signalingService.events.listen(_handleSignalingEvent);
 
     // Listen to WebRTC streams
-    _webrtcService.localStream.listen((stream) {
+    webrtcService.localStream.listen((stream) {
       state = state.copyWith(localStream: stream);
     });
 
-    _webrtcService.remoteStream.listen((stream) {
+    webrtcService.remoteStream.listen((stream) {
       state = state.copyWith(remoteStream: stream);
     });
 
     // Listen to ICE candidates
-    _webrtcService.iceCandidate.listen((candidate) {
+    webrtcService.iceCandidate.listen((candidate) {
       if (_currentRoomId != null && _currentUserId != null) {
-        _signalingService.sendSignal(_currentRoomId!, _currentUserId!, {
+        signalingService.sendSignal(_currentRoomId!, _currentUserId!, {
           'type': 'candidate',
           'candidate': candidate.candidate,
           'sdpMid': candidate.sdpMid,
@@ -106,6 +121,11 @@ class VideoCall extends _$VideoCall {
         });
       }
     });
+  }
+
+  @override
+  VideoCallState build() {
+    _initializeServices();
 
     return const VideoCallState(
       callState: CallState.idle,
@@ -132,7 +152,7 @@ class VideoCall extends _$VideoCall {
       state = state.copyWith(callState: CallState.connecting);
 
       // Get room information
-      final room = await _videoCallService.getRoomByAppointment(appointmentId);
+      final room = await videoCallService.getRoomByAppointment(appointmentId);
       state = state.copyWith(room: room);
 
       _currentRoomId = room.roomId;
@@ -151,18 +171,18 @@ class VideoCall extends _$VideoCall {
       // Get auth token for signaling
 
       // Connect to signaling server
-      _signalingService.connect(token: token!);
+      signalingService.connect(token: token!);
 
       // Initialize WebRTC
-      await _webrtcService.initialize();
+      await webrtcService.initialize();
 
       // Join room
-      _signalingService.joinRoom(room.roomId, user.id);
+      signalingService.joinRoom(room.roomId, user.id);
 
       state = state.copyWith(
         callState: CallState.connected,
-        isAudioEnabled: _webrtcService.isAudioEnabled,
-        isVideoEnabled: _webrtcService.isVideoEnabled,
+        isAudioEnabled: webrtcService.isAudioEnabled,
+        isVideoEnabled: webrtcService.isVideoEnabled,
       );
     } catch (e) {
       debugPrint('Error joining call: $e');
@@ -185,8 +205,8 @@ class VideoCall extends _$VideoCall {
       case 'user-joined':
         debugPrint('Another user joined');
         // Create and send offer
-        final offer = await _webrtcService.createOffer();
-        _signalingService.sendSignal(_currentRoomId!, _currentUserId!, {
+        final offer = await webrtcService.createOffer();
+        signalingService.sendSignal(_currentRoomId!, _currentUserId!, {
           'type': 'offer',
           'sdp': offer.sdp,
         });
@@ -245,24 +265,24 @@ class VideoCall extends _$VideoCall {
     try {
       if (signalType == 'offer') {
         // Set remote description
-        await _webrtcService.setRemoteDescription(
+        await webrtcService.setRemoteDescription(
           RTCSessionDescription(signal['sdp'], signalType),
         );
 
         // Create and send answer
-        final answer = await _webrtcService.createAnswer();
-        _signalingService.sendSignal(_currentRoomId!, _currentUserId!, {
+        final answer = await webrtcService.createAnswer();
+        signalingService.sendSignal(_currentRoomId!, _currentUserId!, {
           'type': 'answer',
           'sdp': answer.sdp,
         });
       } else if (signalType == 'answer') {
         // Set remote description
-        await _webrtcService.setRemoteDescription(
+        await webrtcService.setRemoteDescription(
           RTCSessionDescription(signal['sdp'], signalType),
         );
       } else if (signalType == 'candidate') {
         // Add ICE candidate
-        await _webrtcService.addIceCandidate(
+        await webrtcService.addIceCandidate(
           RTCIceCandidate(
             signal['candidate'],
             signal['sdpMid'],
@@ -278,49 +298,41 @@ class VideoCall extends _$VideoCall {
 
   /// Toggle audio
   void toggleAudio() {
-    _webrtcService.toggleAudio();
-    final isEnabled = _webrtcService.isAudioEnabled;
+    webrtcService.toggleAudio();
+    final isEnabled = webrtcService.isAudioEnabled;
     state = state.copyWith(isAudioEnabled: isEnabled);
 
     // Notify remote participant via signaling
     if (_currentRoomId != null && _currentUserId != null) {
-      _signalingService.toggleAudio(
-        _currentRoomId!,
-        _currentUserId!,
-        isEnabled,
-      );
+      signalingService.toggleAudio(_currentRoomId!, _currentUserId!, isEnabled);
     }
   }
 
   /// Toggle video
   void toggleVideo() {
-    _webrtcService.toggleVideo();
-    final isEnabled = _webrtcService.isVideoEnabled;
+    webrtcService.toggleVideo();
+    final isEnabled = webrtcService.isVideoEnabled;
     state = state.copyWith(isVideoEnabled: isEnabled);
 
     // Notify remote participant via signaling
     if (_currentRoomId != null && _currentUserId != null) {
-      _signalingService.toggleVideo(
-        _currentRoomId!,
-        _currentUserId!,
-        isEnabled,
-      );
+      signalingService.toggleVideo(_currentRoomId!, _currentUserId!, isEnabled);
     }
   }
 
   /// Switch camera
   Future<void> switchCamera() async {
-    await _webrtcService.switchCamera();
+    await webrtcService.switchCamera();
   }
 
   /// Start screen sharing (practitioners only)
   Future<void> startScreenShare() async {
     try {
-      await _webrtcService.startScreenShare();
+      await webrtcService.startScreenShare();
       state = state.copyWith(isScreenSharing: true);
 
       if (_currentRoomId != null && _currentUserId != null) {
-        _signalingService.startScreenShare(_currentRoomId!, _currentUserId!);
+        signalingService.startScreenShare(_currentRoomId!, _currentUserId!);
       }
     } catch (e) {
       debugPrint('Error starting screen share: $e');
@@ -331,11 +343,11 @@ class VideoCall extends _$VideoCall {
   /// Stop screen sharing
   Future<void> stopScreenShare() async {
     try {
-      await _webrtcService.stopScreenShare();
+      await webrtcService.stopScreenShare();
       state = state.copyWith(isScreenSharing: false);
 
       if (_currentRoomId != null && _currentUserId != null) {
-        _signalingService.stopScreenShare(_currentRoomId!, _currentUserId!);
+        signalingService.stopScreenShare(_currentRoomId!, _currentUserId!);
       }
     } catch (e) {
       debugPrint('Error stopping screen share: $e');
@@ -346,12 +358,12 @@ class VideoCall extends _$VideoCall {
   Future<void> leaveCall() async {
     try {
       if (_currentRoomId != null && _currentUserId != null) {
-        _signalingService.endCall(_currentRoomId!, _currentUserId!);
-        _signalingService.leaveRoom(_currentRoomId!, _currentUserId!);
+        signalingService.endCall(_currentRoomId!, _currentUserId!);
+        signalingService.leaveRoom(_currentRoomId!, _currentUserId!);
       }
 
-      await _webrtcService.dispose();
-      _signalingService.disconnect();
+      await webrtcService.dispose();
+      signalingService.disconnect();
 
       _currentRoomId = null;
       _currentUserId = null;

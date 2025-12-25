@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   static const primary = Color(0xFF1993E5);
@@ -17,7 +16,7 @@ class AppTheme {
     colorScheme: ColorScheme.fromSeed(
       seedColor: primary,
     ).copyWith(primary: textPrimary, surface: background),
-    textTheme: GoogleFonts.lexendTextTheme(textTheme),
+    textTheme: textTheme,
     scaffoldBackgroundColor: background,
   );
 

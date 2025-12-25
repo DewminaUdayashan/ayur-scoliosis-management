@@ -165,7 +165,7 @@ class _VideoCallRoomProviderElement
   String get appointmentId => (origin as VideoCallRoomProvider).appointmentId;
 }
 
-String _$videoCallHash() => r'553223a51caa94a0678b4ceeae0462f736b965cb';
+String _$videoCallHash() => r'fd14c8b477bff55cba8a37de0a64e5b7f83be4a6';
 
 /// See also [VideoCall].
 @ProviderFor(VideoCall)

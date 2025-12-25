@@ -7,7 +7,7 @@ part of 'appointment_details.dart';
 // **************************************************************************
 
 String _$appointmentDetailsHash() =>
-    r'3f01c2d9ad801e109414bc5ff9dc2d8d7edc9e38';
+    r'3329cda773136d9cbf4de6124724ecc6efaa513e';
 
 /// Copied from Dart SDK
 class _SystemHash {

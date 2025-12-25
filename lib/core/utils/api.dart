@@ -1,15 +1,41 @@
+import 'package:ayur_scoliosis_management/services/storage/secure_storage_service_impl.dart';
+import 'package:flutter/foundation.dart';
+
 class Api {
   Api._();
   static final Api _instance = Api._();
   factory Api() => _instance;
 
+  static const String _defaultIp = '192.168.1.137';
+  static String _currentIp = _defaultIp;
+
+  // Load saved IP address
+  static Future<void> loadIpAddress() async {
+    _currentIp =
+        await SecureStorageService.instance.read<String>(
+          'debug_ip',
+          (value) => value.toString(),
+        ) ??
+        _defaultIp;
+  }
+
+  // Save IP address (only in debug mode)
+  static Future<void> setIpAddress(String ip) async {
+    if (kDebugMode) {
+      _currentIp = ip;
+      await SecureStorageService.instance.write('debug_ip', ip);
+    }
+  }
+
+  static String get _ip => _currentIp;
+
   // For development on different platforms
   static String get baseUrl {
-    return 'http://192.168.1.137:3000'; // Default to localhost for development
+    return 'http://$_ip:3000'; // Default to localhost for development
   }
 
   static String get classifierBaseUrl {
-    return 'http://192.168.1.137:8000';
+    return 'http://$_ip:8000';
   }
 
   static final _apiPath = '/';

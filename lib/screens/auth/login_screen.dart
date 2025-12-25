@@ -14,9 +14,53 @@ import '../../core/extensions/size.dart';
 import '../../core/extensions/theme.dart';
 import '../../core/extensions/validators.dart';
 import '../../core/extensions/value_notifier.dart';
+import '../../core/utils/api.dart';
 import '../../gen/assets.gen.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/buttons/primary_button.dart';
+
+void _showIpDialog(BuildContext context) {
+  final ipController = TextEditingController();
+
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Debug: Change IP Address'),
+      content: TextField(
+        controller: ipController,
+        decoration: const InputDecoration(
+          labelText: 'IP Address',
+          hintText: '192.168.1.137',
+        ),
+        keyboardType: TextInputType.numberWithOptions(decimal: true),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () async {
+            if (ipController.text.isNotEmpty) {
+              await Api.setIpAddress(ipController.text);
+              if (context.mounted) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      'IP changed to: ${ipController.text}\nRestart app to apply',
+                    ),
+                  ),
+                );
+              }
+            }
+          },
+          child: const Text('Save'),
+        ),
+      ],
+    ),
+  );
+}
 
 class LoginScreen extends HookConsumerWidget {
   const LoginScreen({super.key});
@@ -27,6 +71,7 @@ class LoginScreen extends HookConsumerWidget {
     final isLoading = useState(false);
     final emailController = useTextEditingController();
     final passwordController = useTextEditingController();
+    final tapCount = useState(0);
 
     final auth = ref.watch(authProvider).valueOrNull;
 
@@ -62,9 +107,18 @@ class LoginScreen extends HookConsumerWidget {
               children: [
                 SizedBox(height: context.height * 0.1),
                 Center(
-                  child: Image.asset(
-                    Assets.images.logo,
-                    width: context.width * 0.6,
+                  child: GestureDetector(
+                    onTap: () {
+                      tapCount.value++;
+                      if (tapCount.value >= 7) {
+                        tapCount.value = 0;
+                        _showIpDialog(context);
+                      }
+                    },
+                    child: Image.asset(
+                      Assets.images.logo,
+                      width: context.width * 0.6,
+                    ),
                   ),
                 ),
                 Text(

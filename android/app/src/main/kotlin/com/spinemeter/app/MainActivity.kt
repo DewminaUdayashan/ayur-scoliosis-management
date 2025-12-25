@@ -1,4 +1,4 @@
-package com.example.ayur_scoliosis_management
+package com.spinemeter.app
 
 import io.flutter.embedding.android.FlutterActivity
 
