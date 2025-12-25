@@ -70,29 +70,31 @@ class PatientAppointmentCard extends HookConsumerWidget {
                         ),
                       ),
                       const SizedBox(width: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        spacing: 4,
-                        children: [
-                          Text(
-                            '${appointment.name} - Dr.${appointment.practitioner?.firstName}',
-                            style: context.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          spacing: 4,
+                          children: [
+                            Text(
+                              '${appointment.name} - Dr.${appointment.practitioner?.firstName}',
+                              style: context.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                          Text(
-                            '${appointment.appointmentDateTime.readableTimeAndDate} - ${appointment.type.value}',
-                            style: context.textTheme.bodyMedium?.copyWith(
-                              color: Colors.grey.shade600,
+                            Text(
+                              '${appointment.appointmentDateTime.readableTimeAndDate} - ${appointment.type.value}',
+                              style: context.textTheme.bodyMedium?.copyWith(
+                                color: Colors.grey.shade600,
+                              ),
                             ),
-                          ),
-                          Text(
-                            appointment.status.value,
-                            style: context.textTheme.bodyMedium?.copyWith(
-                              color: appointment.status.backgroundColor,
+                            Text(
+                              appointment.status.value,
+                              style: context.textTheme.bodyMedium?.copyWith(
+                                color: appointment.status.backgroundColor,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                       const Spacer(),
                       CircleAvatar(radius: 24),

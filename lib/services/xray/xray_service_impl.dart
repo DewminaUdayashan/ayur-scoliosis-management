@@ -52,12 +52,12 @@ class XRayServiceImpl extends XRayService {
   Future<bool> validateXray(XRayModel xray) async {
     try {
       final dio = Dio();
-      dio.options.baseUrl = api.classifyImageType;
       dio.options.headers = {'Content-Type': 'multipart/form-data'};
       final response = await dio.post(
         api.classifyImageType,
         data: FormData.fromMap({
           'file': await MultipartFile.fromFile(xray.image.path),
+          'enable_cropping': true,
         }),
       );
       if (response.statusCode == 200) {

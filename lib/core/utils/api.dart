@@ -5,11 +5,11 @@ class Api {
 
   // For development on different platforms
   static String get baseUrl {
-    return 'http://192.168.1.120:3000'; // Default to localhost for development
+    return 'http://192.168.1.137:3000'; // Default to localhost for development
   }
 
   static String get classifierBaseUrl {
-    return 'http://192.168.1.120:8000';
+    return 'http://192.168.1.137:8000';
   }
 
   static final _apiPath = '/';
